@@ -1,0 +1,13 @@
+{
+  "name": "cris",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "dev": "node src/index.js"
+  },
+  "dependencies": {
+    "parsimmon": "^1.13.0",
+    "ramda": "^0.26.1"
+  }
+}
