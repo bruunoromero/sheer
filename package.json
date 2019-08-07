@@ -7,6 +7,7 @@
     "dev": "node src/index.js"
   },
   "dependencies": {
+    "@babel/types": "^7.5.5",
     "parsimmon": "^1.13.0",
     "ramda": "^0.26.1"
   }

@@ -1,10 +1,7 @@
-const P = require("parsimmon");
-const t = require("../ast");
+const P = require("parsimmon")
+const t = require("./transformer")
 
 module.exports = P.createLanguage({
-  // An expression is just any of the other values we make in the language. Note
-  // that because we're using `.createLanguage` here we can reference other
-  // parsers off of the argument to our function. `r` is short for `rules` here.
   Expression: r => {
     return P.alt(
       r.Keyword,
@@ -17,15 +14,13 @@ module.exports = P.createLanguage({
       r.Vector,
       r.Map,
       r.Set
-    );
+    )
   },
 
-  // The basic parsers (usually the ones described via regexp) should have a
-  // description for error message purposes.
   Symbol: () => {
     return P.regexp(/[a-zA-Z_-][a-zA-Z0-9_-]*/)
       .mark()
-      .map(t.symbol);
+      .map(t.symbol)
   },
 
   Keyword: r => {
@@ -36,21 +31,19 @@ module.exports = P.createLanguage({
         end,
         value: value.symbol.value
       }))
-      .map(t.keyword);
+      .map(t.keyword)
   },
 
-  // Note that Number("10") === 10, Number("9") === 9, etc in JavaScript.
-  // This is not a recursive parser. Number(x) is similar to parseInt(x, 10).
   Number: () => {
     return P.regexp(/-?(0|[1-9][0-9]*)([.][0-9]+)?([eE][+-]?[0-9]+)?/)
       .mark()
-      .map(t.numberLiteral);
+      .map(t.numberLiteral)
   },
 
   String: () => {
     return P.regexp(/"((?:\\.|.)*?)"/, 1)
       .mark()
-      .map(t.numberLiteral);
+      .map(t.stringLiteral)
   },
 
   Nil: () =>
@@ -63,35 +56,39 @@ module.exports = P.createLanguage({
       .mark()
       .map(t.boolLiteral),
 
-  // `.trim(P.optWhitespace)` removes whitespace from both sides, then `.many()`
-  // repeats the expression zero or more times. Finally, `.wrap(...)` removes
-  // the '(' and ')' from both sides of the list.
   List: r => {
     return r.Expression.trim(P.optWhitespace)
       .many()
-      .wrap(P.string("("), P.string(")"));
+      .wrap(P.string("("), P.string(")"))
+      .mark()
+      .map(t.list)
   },
 
   Vector: r => {
     return r.Expression.trim(P.optWhitespace)
       .many()
-      .wrap(P.string("["), P.string("]"));
+      .wrap(P.string("["), P.string("]"))
+      .mark()
+      .map(t.vector)
   },
 
   Map: r => {
     return r.Expression.trim(P.optWhitespace)
       .many()
-      .wrap(P.string("{"), P.string("}"));
+      .wrap(P.string("{"), P.string("}"))
+      .mark()
+      .map(t.map)
   },
 
   Set: r => {
     return r.Expression.trim(P.optWhitespace)
       .many()
-      .wrap(P.string("#{"), P.string("}"));
+      .wrap(P.string("#{"), P.string("}"))
+      .mark()
+      .map(t.map)
   },
 
-  // A file in Lisp is generally just zero or more expressions.
   File: function(r) {
-    return r.Expression.trim(P.optWhitespace).many();
+    return r.Expression.trim(P.optWhitespace).many()
   }
-});
+})

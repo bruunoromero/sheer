@@ -1,5 +1,5 @@
-const Language = require("./language");
+const Language = require("./language")
 
-module.exports.parse = source => {  
-  return Language.File.tryParse(source);
-};
+module.exports.parse = source => {
+  return Language.File.tryParse(source)
+}
