@@ -1,11 +1,5 @@
 const types = require("./types")
-
-function chunks(array, chunkSize) {
-  const res = []
-  for (let i = 0; i < array.length; i += chunkSize)
-    res.push(array.slice(i, i + chunkSize))
-  return res
-}
+const utils = require("../utils")
 
 const withLocation = (start, end, node) => {
   node.loc = { start, end }
@@ -68,9 +62,9 @@ module.exports.numberLiteral = ({ start, end, value }) => {
   })
 }
 
-module.exports.nilLiteral = ({ start, end, value }) => {
+module.exports.nullLiteral = ({ start, end, value }) => {
   return withLocation(start, end, {
-    type: types.NIL
+    type: types.NULL
   })
 }
 

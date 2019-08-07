@@ -6,7 +6,7 @@ module.exports = P.createLanguage({
     return P.alt(
       r.Keyword,
       r.String,
-      r.Nil,
+      r.Null,
       r.Bool,
       r.Number,
       r.Symbol,
@@ -46,10 +46,10 @@ module.exports = P.createLanguage({
       .map(t.stringLiteral)
   },
 
-  Nil: () =>
-    P.string("nil")
+  Null: () =>
+    P.string("null")
       .mark()
-      .map(t.nilLiteral),
+      .map(t.nullLiteral),
 
   Bool: () =>
     P.alt(P.string("true"), P.string("false"))

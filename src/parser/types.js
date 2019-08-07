@@ -1,7 +1,7 @@
 module.exports = {
   MAP: "MAP",
   SET: "SET",
-  NIL: "NIL",
+  NULL: "NULL",
   BOOL: "BOOL",
   LIST: "LIST",
   VECTOR: "VECTOR",
