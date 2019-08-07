@@ -34,7 +34,7 @@ const file = (name, source, program) => {
   }
 }
 
-module.exports.compile = (name, source) => {
+module.exports.compile = (path, source) => {
   const program = parser.parse(source)
-  return file(name, source, program)
+  return file(path, source, program)
 }

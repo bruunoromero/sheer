@@ -1,7 +1,14 @@
 const fs = require("fs")
+const path = require("path")
 const cosmiconfig = require("cosmiconfig")
 
+const ENTRY_NAME = "main.cris"
+
+let _config
+
 const loadConfig = () => {
+  if (_config) return _config
+
   const explorer = cosmiconfig("cris")
   const result = explorer.searchSync()
 
@@ -9,13 +16,18 @@ const loadConfig = () => {
     throw "Could not load configuration file"
   }
 
+  _config = result
   return result
 }
 
-const loadMain = () => {
-  const result = loadConfig()
-  
+const mainPath = ({ config, isEmpty, filepath }) => {
+  return path.join(path.dirname(filepath), config.src, ENTRY_NAME)
 }
 
-module.exports.loadMain = loadMain
+const config = () => {
+  return _config
+}
+
+module.exports.config = config
+module.exports.mainPath = mainPath
 module.exports.loadConfig = loadConfig

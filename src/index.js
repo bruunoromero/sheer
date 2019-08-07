@@ -1,13 +1,12 @@
+const loader = require("./loader")
 const project = require("./project")
 const compiler = require("./compiler")
 const bootstrap = require("./bootstrap")
 
 bootstrap()
 
-console.log(project.loadConfig())
+const rc = project.loadConfig()
+const mainPath = project.mainPath(rc)
+const mainContent = loader.loadFile(mainPath)
 
-console.log(
-  compiler
-    .compile("testing.cris", "(a 1 x true false nil -1 -0.1 :a null) (a b)")
-    .program()
-)
+console.log(compiler.compile(mainPath, mainContent).program())
