@@ -5,8 +5,7 @@ const bootstrap = require("./bootstrap")
 
 bootstrap()
 
-const rc = project.loadConfig()
-const mainPath = project.mainPath(rc)
-const mainContent = loader.loadFile(mainPath)
+const config = project.loadConfig()
+const mainContent = loader.loadFile(config.mainPath)
 
-console.log(compiler.compile(mainPath, mainContent).program())
+console.log(compiler.compile(config.mainPath, mainContent, config).name())

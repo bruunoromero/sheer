@@ -7,3 +7,12 @@ module.exports.chunks = (array, chunkSize) => {
 
   return res
 }
+
+module.exports.pathToName = (filePath, { rootSource }, sep) => {
+  const nonExt = filePath.split(".")[0]
+
+  return nonExt
+    .replace(rootSource + sep, "")
+    .split(sep)
+    .join(".")
+}
