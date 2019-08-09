@@ -1,3 +1,11 @@
+const path = require("path")
+
+const pathNoExt = filePath => {
+  const ext = path.extname(filePath)
+
+  return filePath.slice(0, -ext.length)
+}
+
 module.exports.chunks = (array, chunkSize) => {
   const res = []
 
@@ -8,11 +16,12 @@ module.exports.chunks = (array, chunkSize) => {
   return res
 }
 
-module.exports.pathToName = (filePath, { rootSource }, sep) => {
-  const nonExt = filePath.split(".")[0]
+module.exports.pathToName = (filePath, { rootSource }) => {
+  const nonExt = pathNoExt(filePath)
 
+  console.log(nonExt)
   return nonExt
-    .replace(rootSource + sep, "")
-    .split(sep)
+    .replace(rootSource + path.sep, "")
+    .split(path.sep)
     .join(".")
 }
