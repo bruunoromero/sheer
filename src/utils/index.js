@@ -19,9 +19,12 @@ module.exports.chunks = (array, chunkSize) => {
 module.exports.pathToName = (filePath, { rootSource }) => {
   const nonExt = pathNoExt(filePath)
 
-  console.log(nonExt)
   return nonExt
     .replace(rootSource + path.sep, "")
     .split(path.sep)
     .join(".")
+}
+
+module.exports.nameToPath = (name, { rootSource }) => {
+  return path.resolve(rootSource, name.split(".").join(path.sep))
 }
