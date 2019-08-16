@@ -1,5 +1,5 @@
 const Language = require("./language")
 
-module.exports.parse = source => {
+module.exports = source => {
   return Language.File.tryParse(source)
 }

@@ -1,6 +1,8 @@
 const path = require("path")
+
+const ir = require("../ir")
 const utils = require("../utils")
-const parser = require("../parser")
+const parse = require("../parser")
 
 const file = (name, path, source, program) => {
   const _name = name
@@ -36,9 +38,14 @@ const file = (name, path, source, program) => {
   }
 }
 
-module.exports.compile = (filePath, source, config) => {
-  const program = parser.parse(source)
-  const name = utils.pathToName(filePath, config, path.sep)
-
-  return file(name, filePath, source, program)
+module.exports = (filePath, source, config) => {
+  try {
+    const program = parse(source)
+    const name = utils.pathToName(filePath, config, path.sep)
+    const intermediate = ir(filePath, source, program)
+    console.log(intermediate)
+    return file(name, filePath, source, intermediate)
+  } catch (e) {
+    console.log(e)
+  }
 }

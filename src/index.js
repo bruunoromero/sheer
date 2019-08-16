@@ -1,11 +1,12 @@
 const loader = require("./loader")
 const project = require("./project")
-const compiler = require("./compiler")
-const bootstrap = require("./bootstrap")
-
-bootstrap()
+const compile = require("./compiler")
 
 const config = project.loadConfig()
 const mainContent = loader.loadFile(config.mainPath)
 
-console.log(compiler.compile(config.mainPath, mainContent, config).name())
+const file = compile(config.mainPath, mainContent, config)
+
+if (file) {
+  // console.log(file)
+}

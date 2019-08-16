@@ -1,1 +1,5 @@
+(ns core)
 (def a 10)
+(if a b c)
+(when a b)
+(and a b c)
