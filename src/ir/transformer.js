@@ -23,16 +23,31 @@ module.exports.primitive = ({ value, type }) => {
   }
 }
 
+module.exports.vector = value => {
+  return {
+    value,
+    type: t.VECTOR
+  }
+}
+
+module.exports.fn = (args, body) => {
+  return {
+    body,
+    args,
+    type: t.FN
+  }
+}
+
 module.exports.symbol = ({ value, type }) => {
   return { type, value: utils.normalizeName(value) }
 }
 
-module.exports.if_ = (cond, thuthy, falsy) => {
-  return { type: t.IF, cond, thuthy, falsy }
+module.exports.if_ = (cond, truthy, falsy) => {
+  return { type: t.IF, cond, truthy, falsy }
 }
 
-module.exports.when = (cond, thuthy) => {
-  return { type: t.IF, cond, thuthy, falsy: null_ }
+module.exports.when = (cond, truthy) => {
+  return { type: t.IF, cond, truthy, falsy: null_ }
 }
 
 module.exports.def = (sym, expr) => {
@@ -80,7 +95,7 @@ const eq = args => {
     return {
       type: t.EQ,
       left: args[0],
-      right: or(args.slice(1))
+      right: eq(args.slice(1))
     }
   }
 
@@ -91,9 +106,47 @@ const eq = args => {
   }
 }
 
+const notEq = args => {
+  if (args.length > 2) {
+    return {
+      type: t.NOT_EQ,
+      left: args[0],
+      right: notEq(args.slice(1))
+    }
+  }
+
+  return {
+    type: t.NOT_EQ,
+    left: args[0],
+    right: args[1]
+  }
+}
+
+module.exports.not = value => {
+  return {
+    value,
+    type: t.NOT
+  }
+}
+
+module.exports.declare = value => {
+  return {
+    value,
+    type: t.DECLARE
+  }
+}
+
+module.exports.export = value => {
+  return {
+    value,
+    type: t.EXPORT
+  }
+}
+
 module.exports.eq = eq
 module.exports.or = or
 module.exports.and = and
+module.exports.notEq = notEq
 module.exports.null_ = null_
 module.exports.true_ = true_
 module.exports.false_ = false_

@@ -1,0 +1,102 @@
+const babel = require("@babel/types")
+
+module.exports.statement = node => {
+  if (
+    node.type.toLowerCase().indexOf("expression") > -1 ||
+    node.type.toLowerCase().indexOf("literal") > -1
+  ) {
+    return babel.expressionStatement(node)
+  }
+
+  return node
+}
+
+module.exports.number = node => {
+  return babel.numericLiteral(node.value)
+}
+
+module.exports.declare = node => {
+  return babel.assignmentExpression(
+    "=",
+    babel.memberExpression(
+      babel.identifier("globals"),
+      babel.identifier(node.value)
+    ),
+    babel.nullLiteral()
+  )
+}
+
+module.exports.def = (node, traverse) => {
+  return babel.assignmentExpression(
+    "=",
+    babel.memberExpression(
+      babel.identifier("globals"),
+      babel.identifier(node.name)
+    ),
+    traverse(node.value)
+  )
+}
+
+module.exports.symbol = node => {
+  return babel.identifier(node.value)
+}
+
+module.exports.if_ = (node, traverse) => {
+  return babel.conditionalExpression(
+    traverse(node.cond),
+    traverse(node.truthy),
+    traverse(node.falsy)
+  )
+}
+
+module.exports.null_ = () => {
+  return babel.nullLiteral()
+}
+
+module.exports.and = (node, traverse) => {
+  return babel.logicalExpression(
+    "&&",
+    traverse(node.left),
+    traverse(node.right)
+  )
+}
+
+module.exports.eq = (node, traverse) => {
+  return babel.binaryExpression(
+    "===",
+    traverse(node.left),
+    traverse(node.right)
+  )
+}
+
+module.exports.notEq = (node, traverse) => {
+  return babel.binaryExpression(
+    "!==",
+    traverse(node.left),
+    traverse(node.right)
+  )
+}
+
+module.exports.not = (node, traverse) => {
+  return babel.unaryExpression("!", traverse(node.value))
+}
+
+module.exports.fn = (node, traverse) => {
+  //TODO
+  return babel.nullLiteral()
+}
+
+module.exports.export = (node, traverse) => {
+  return babel.exportNamedDeclaration(
+    babel.variableDeclaration("const", [
+      babel.variableDeclarator(
+        babel.identifier(node.value),
+        babel.memberExpression(
+          babel.identifier("globals"),
+          babel.identifier(node.value)
+        )
+      )
+    ]),
+    []
+  )
+}

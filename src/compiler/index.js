@@ -1,8 +1,11 @@
+const fs = require("fs")
 const path = require("path")
+const generate = require("@babel/generator").default
 
 const ir = require("../ir")
 const utils = require("../utils")
 const parse = require("../parser")
+const traverse = require("./traverser")
 
 const file = (name, path, source, program) => {
   const _name = name
@@ -43,7 +46,14 @@ module.exports = (filePath, source, config) => {
     const program = parse(source)
     const name = utils.pathToName(filePath, config, path.sep)
     const intermediate = ir(filePath, source, program)
-    console.log(intermediate)
+    const compiled = traverse(intermediate)
+    const generated = generate(compiled)
+
+    fs.writeFileSync(
+      "/Users/bruno.barreira/git-repo/cris/compiled.js",
+      generated.code
+    )
+
     return file(name, filePath, source, intermediate)
   } catch (e) {
     console.log(e)

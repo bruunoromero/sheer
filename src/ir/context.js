@@ -1,9 +1,9 @@
-module.exports = () => {
+module.exports = parent => {
   let _name = null
-
   const _defs = {}
   const _exports = []
   const _requires = {}
+  const _parent = parent
 
   return {
     name(n) {
@@ -29,7 +29,7 @@ module.exports = () => {
     addDefinition(name, isExportable, meta) {
       _defs[name] = meta
 
-      if (isExportable) {
+      if (isExportable && !_exports.find(n => n === name)) {
         _exports.push(name)
       }
     },

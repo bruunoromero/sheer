@@ -1,5 +1,2 @@
-(ns core)
-(def a 10)
-(if a b c)
-(when a b)
-(and a b c)
+(ns core.teste$&)
+(def a (if a b c))
