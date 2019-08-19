@@ -1,6 +1,7 @@
+const utils = require("../utils")
 const t = require("../parser/types")
 
-const utils = require("../utils")
+const context = require("./context")
 const validator = require("./validator")
 const transformer = require("./transformer")
 
@@ -19,7 +20,8 @@ const coreFunction = (validateFn, fn) => validator => (
 }
 
 const fn = coreFunction(validator.fn, (meta, args, ctx, traverse) => {
-  const [args_, ...body] = traverseArgs(args, ctx, traverse)
+  const fCtx = context(ctx)
+  const [args_, ...body] = traverseArgs(args, fCtx, traverse)
 
   return transformer.fn(args_, body)
 })
@@ -44,9 +46,11 @@ const defp = coreFunction(validator.defp, (meta, args, ctx, traverse) => {
 const defn = coreFunction(
   validator.def,
   (meta, args, ctx, traverse, validator) => {
-    const [sym, ...rest] = traverseArgs(args, ctx, traverse)
+    const [sym, ...rest] = args
+    const tSym = traverse(sym, ctx)
+
     const value = fn(validator)(meta, rest, ctx)
-    const transformed = transformer.def(sym, value)
+    const transformed = transformer.def(tSym, value)
 
     ctx.addDefinition(sym.value, true, transformed)
 
