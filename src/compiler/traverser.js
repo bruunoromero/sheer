@@ -1,12 +1,13 @@
 const babel = require("@babel/types")
 
 const t = require("../ir/types")
+const utils = require("../utils")
 const transformer = require("./transformer")
 
 module.exports = ir => {
   const globals = babel.variableDeclaration("const", [
     babel.variableDeclarator(
-      babel.identifier("globals"),
+      babel.identifier(utils.GLOBALS),
       babel.objectExpression([])
     )
   ])
@@ -42,6 +43,10 @@ const traverse = node => {
       return transformer.fn(node, traverse)
     case t.EXPORT:
       return transformer.export(node, traverse)
+    case t.MEMBER:
+      return transformer.member(node, traverse)
+    case t.VECTOR:
+      return transformer.vector(node, traverse)
   }
 
   throw `could not traverse type ${node.type} at compiler`

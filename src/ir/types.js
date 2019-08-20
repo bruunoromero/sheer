@@ -8,6 +8,7 @@ module.exports = {
   DEF: "DEF",
   NULL: "NULL",
   BOOL: "BOOL",
+  MEMBER: "MEMBER",
   NOT_EQ: "NOT_EQ",
   NUMBER: "NUMBER",
   STRING: "STRING",

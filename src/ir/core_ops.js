@@ -14,7 +14,7 @@ const coreFunction = (validateFn, fn) => validator => (
   ctx,
   traverse
 ) => {
-  validateFn(validator, meta, args)
+  validateFn(validator, meta, args, ctx)
 
   return fn(meta, args, ctx, traverse, validator)
 }

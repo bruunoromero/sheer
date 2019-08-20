@@ -58,3 +58,5 @@ module.exports.unnormalizeName = name => {
     .replace(/_BSLASH_/g, "\\")
     .replace(/_/g, "-")
 }
+
+module.exports.GLOBALS = "__$$GLOBALS$$__"

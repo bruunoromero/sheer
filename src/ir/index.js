@@ -1,9 +1,18 @@
 const context = require("./context")
 const coreOps = require("./core_ops")
+const resolve = require("./resolver")
 const validator = require("./validator")
 const transformer = require("./transformer")
 
 const pt = require("../parser/types")
+
+const resolveSymbols = fn => (node, ctx) => {
+  const traversed = fn(node, ctx)
+
+  if (traversed) {
+    return resolve(traversed, ctx)
+  }
+}
 
 module.exports = (filename, source, ast) => {
   const vldt = validator(filename, source)
@@ -32,7 +41,7 @@ module.exports = (filename, source, ast) => {
     return ctx.exports().map(transformer.export)
   }
 
-  const traverse = (node, ctx) => {
+  const traverse = resolveSymbols((node, ctx) => {
     switch (node.type) {
       case pt.NULL:
       case pt.BOOL:
@@ -49,7 +58,7 @@ module.exports = (filename, source, ast) => {
     }
 
     throw new Error(`could not traverse type ${node.type}`)
-  }
+  })
 
   const traverseVector = ({ value }, ctx) => {
     const mValue = value.map(el => traverse(el, ctx))

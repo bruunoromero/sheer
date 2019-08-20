@@ -1,6 +1,18 @@
 const t = require("./types")
 const utils = require("../utils")
 
+const manyOp = (args, op) => {
+  const els = args.slice(0, -1)
+  const sEls = args.slice(1)
+
+  const eqs = els.map((el, i) => {
+    const sEl = sEls[i]
+    return op([el, sEl])
+  })
+
+  return and(eqs)
+}
+
 const true_ = {
   type: t.BOOL,
   value: true
@@ -92,11 +104,7 @@ const or = args => {
 
 const eq = args => {
   if (args.length > 2) {
-    return {
-      type: t.EQ,
-      left: args[0],
-      right: eq(args.slice(1))
-    }
+    return manyOp(args, eq)
   }
 
   return {
@@ -108,11 +116,7 @@ const eq = args => {
 
 const notEq = args => {
   if (args.length > 2) {
-    return {
-      type: t.NOT_EQ,
-      left: args[0],
-      right: notEq(args.slice(1))
-    }
+    return manyOp(args, notEq)
   }
 
   return {
@@ -140,6 +144,14 @@ module.exports.export = value => {
   return {
     value,
     type: t.EXPORT
+  }
+}
+
+module.exports.member = ([owner, member]) => {
+  return {
+    owner,
+    member,
+    type: t.MEMBER
   }
 }
 

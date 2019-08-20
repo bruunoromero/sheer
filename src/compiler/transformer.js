@@ -1,5 +1,7 @@
 const babel = require("@babel/types")
 
+const utils = require("../utils")
+
 module.exports.statement = node => {
   if (
     node.type.toLowerCase().indexOf("expression") > -1 ||
@@ -19,10 +21,17 @@ module.exports.declare = node => {
   return babel.assignmentExpression(
     "=",
     babel.memberExpression(
-      babel.identifier("globals"),
+      babel.identifier(utils.GLOBALS),
       babel.identifier(node.value)
     ),
     babel.nullLiteral()
+  )
+}
+
+module.exports.member = node => {
+  return babel.memberExpression(
+    babel.identifier(node.owner),
+    babel.identifier(node.member)
   )
 }
 
@@ -30,7 +39,7 @@ module.exports.def = (node, traverse) => {
   return babel.assignmentExpression(
     "=",
     babel.memberExpression(
-      babel.identifier("globals"),
+      babel.identifier(utils.GLOBALS),
       babel.identifier(node.name)
     ),
     traverse(node.value)
@@ -92,11 +101,15 @@ module.exports.export = (node, traverse) => {
       babel.variableDeclarator(
         babel.identifier(node.value),
         babel.memberExpression(
-          babel.identifier("globals"),
+          babel.identifier(utils.GLOBALS),
           babel.identifier(node.value)
         )
       )
     ]),
     []
   )
+}
+
+module.exports.vector = (node, traverse) => {
+  return babel.arrayExpression(node.value.map(traverse))
 }

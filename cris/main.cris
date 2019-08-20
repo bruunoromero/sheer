@@ -1,2 +1,2 @@
-(ns core.teste$&)
-(def a (if a b c))
+(def a 1)
+(def b (= a 1))

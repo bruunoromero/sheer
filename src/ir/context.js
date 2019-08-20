@@ -1,3 +1,5 @@
+const utils = require("../utils")
+
 module.exports = parent => {
   let _name = null
   const _defs = {}
@@ -12,6 +14,20 @@ module.exports = parent => {
       }
 
       return _name
+    },
+    has(name) {
+      if (_defs[name]) return true
+
+      if (_parent) return _parent.has(name)
+
+      return false
+    },
+    resolve(name) {
+      if (_defs[name] && !_parent) {
+        return [utils.GLOBALS, name]
+      }
+
+      return name
     },
     exports() {
       return _exports
