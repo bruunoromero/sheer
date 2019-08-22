@@ -15,5 +15,6 @@ module.exports = {
   SYMBOL: "SYMBOL",
   VECTOR: "VECTOR",
   EXPORT: "EXPORT",
-  DECLARE: "DECLARE"
-}
+  DECLARE: "DECLARE",
+  FN_CALL: "FN_CALL"
+};

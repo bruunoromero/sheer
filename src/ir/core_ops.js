@@ -1,12 +1,12 @@
-const utils = require("../utils")
-const t = require("../parser/types")
+const utils = require("../utils");
+const t = require("../parser/types");
 
-const context = require("./context")
-const validator = require("./validator")
-const transformer = require("./transformer")
+const context = require("./context");
+const validator = require("./validator");
+const transformer = require("./transformer");
 
 const traverseArgs = (args, ctx, traverse) =>
-  args.map(el => traverse(el, ctx)).filter(e => e)
+  args.map(el => traverse(el, ctx)).filter(e => e);
 
 const coreFunction = (validateFn, fn) => validator => (
   meta,
@@ -14,144 +14,154 @@ const coreFunction = (validateFn, fn) => validator => (
   ctx,
   traverse
 ) => {
-  validateFn(validator, meta, args, ctx)
+  validateFn(validator, meta, args, ctx);
 
-  return fn(meta, args, ctx, traverse, validator)
-}
+  return fn(meta, args, ctx, traverse, validator);
+};
+
+const fnCall = coreFunction(validator.ok, (meta, args, ctx, traverse) => {
+  const callee = traverse(meta.value[0], ctx);
+
+  return transformer.fnCall(callee, traverseArgs(args, ctx, traverse));
+});
 
 const fn = coreFunction(validator.fn, (meta, args, ctx, traverse) => {
-  const fCtx = context(ctx)
-  const [args_, ...body] = traverseArgs(args, fCtx, traverse)
+  const fCtx = context(ctx);
+  const params = traverse(args[0], fCtx);
 
-  return transformer.fn(args_, body)
-})
+  params.value.forEach(el => fCtx.addDefinition(el.value));
+
+  const body = traverseArgs(args.slice(1), fCtx, traverse);
+
+  return transformer.fn(params.value, body);
+});
 
 const def = coreFunction(validator.def, (meta, args, ctx, traverse) => {
-  const [sym, value] = traverseArgs(args, ctx, traverse)
-  const transformed = transformer.def(sym, value)
+  const [sym, value] = traverseArgs(args, ctx, traverse);
+  const transformed = transformer.def(sym, value);
 
-  ctx.addDefinition(sym.value, true, transformed)
+  ctx.addDefinition(sym.value, true, transformed);
 
-  return transformed
-})
+  return transformed;
+});
 
 const defp = coreFunction(validator.defp, (meta, args, ctx, traverse) => {
-  const [sym, value] = traverseArgs(args, ctx, traverse)
-  const transformed = transformer.def(sym, value)
-  ctx.addDefinition(sym.value, false, transformed)
+  const [sym, value] = traverseArgs(args, ctx, traverse);
+  const transformed = transformer.def(sym, value);
+  ctx.addDefinition(sym.value, false, transformed);
 
-  return transformed
-})
+  return transformed;
+});
 
 const defn = coreFunction(
   validator.def,
   (meta, args, ctx, traverse, validator) => {
-    const [sym, ...rest] = args
-    const tSym = traverse(sym, ctx)
+    const [sym, ...rest] = args;
+    const tSym = traverse(sym, ctx);
 
-    const value = fn(validator)(meta, rest, ctx)
-    const transformed = transformer.def(tSym, value)
+    const value = fn(validator)(meta, rest, ctx);
+    const transformed = transformer.def(tSym, value);
 
-    ctx.addDefinition(sym.value, true, transformed)
+    ctx.addDefinition(sym.value, true, transformed);
 
-    return transformed
+    return transformed;
   }
-)
+);
 
 const defnp = coreFunction(
   validator.def,
   (meta, args, ctx, traverse, validator) => {
-    const [sym, ...rest] = traverseArgs(args, ctx, traverse)
-    const value = fn(validator)(meta, rest, ctx)
-    const transformed = transformer.def(sym, value)
+    const [sym, ...rest] = traverseArgs(args, ctx, traverse);
+    const value = fn(validator)(meta, rest, ctx);
+    const transformed = transformer.def(sym, value);
 
-    ctx.addDefinition(sym.value, false, transformed)
+    ctx.addDefinition(sym.value, false, transformed);
 
-    return transformed
+    return transformed;
   }
-)
+);
 
 const ns = coreFunction(validator.ns, (meta, args, ctx, traverse) => {
-  const [sym] = traverseArgs(args, ctx, traverse)
+  const [sym] = traverseArgs(args, ctx, traverse);
 
-  ctx.name(sym.value)
-})
+  ctx.name(sym.value);
+});
 
 const if_ = coreFunction(validator.if_, (meta, args, ctx, traverse) => {
-  const [cond, truthy, falsy] = traverseArgs(args, ctx, traverse)
+  const [cond, truthy, falsy] = traverseArgs(args, ctx, traverse);
 
-  return transformer.if_(cond, truthy, falsy)
-})
+  return transformer.if_(cond, truthy, falsy);
+});
 
 const when = coreFunction(validator.when, (meta, args, ctx, traverse) => {
-  const [cond, truthy, falsy] = traverseArgs(args, ctx, traverse)
+  const [cond, truthy, falsy] = traverseArgs(args, ctx, traverse);
 
-  return transformer.when(cond, truthy, falsy)
-})
+  return transformer.when(cond, truthy, falsy);
+});
 
 const and = coreFunction(validator.ok, (meta, args, ctx, traverse) => {
-  const _args = traverseArgs(args, ctx, traverse)
+  const _args = traverseArgs(args, ctx, traverse);
   if (_args.length === 0) {
-    return transformer.true_
+    return transformer.true_;
   }
 
   if (_args.length === 1) {
-    return _args[0]
+    return _args[0];
   }
 
-  return transformer.and(_args)
-})
+  return transformer.and(_args);
+});
 
 const or = coreFunction(validator.ok, (meta, args, ctx, traverse) => {
-  const _args = traverseArgs(args, ctx, traverse)
+  const _args = traverseArgs(args, ctx, traverse);
   if (_args.length === 0) {
-    return transformer.true_
+    return transformer.true_;
   }
 
   if (_args.length === 1) {
-    return _args[0]
+    return _args[0];
   }
 
-  return transformer.or(_args)
-})
+  return transformer.or(_args);
+});
 
 const eq = coreFunction(validator.ok, (meta, args, ctx, traverse) => {
-  const _args = traverseArgs(args, ctx, traverse)
+  const _args = traverseArgs(args, ctx, traverse);
 
   if (_args.length === 0) {
-    return transformer.true_
+    return transformer.true_;
   }
 
   if (_args.length === 1) {
-    return _args[0]
+    return _args[0];
   }
 
-  return transformer.eq(_args)
-})
+  return transformer.eq(_args);
+});
 
 const notEq = coreFunction(validator.ok, (meta, args, ctx, traverse) => {
-  const _args = traverseArgs(args, ctx, traverse)
+  const _args = traverseArgs(args, ctx, traverse);
 
   if (_args.length === 0) {
-    return transformer.false_
+    return transformer.false_;
   }
 
   if (_args.length === 1) {
-    return _args[0]
+    return _args[0];
   }
 
-  return transformer.notEq(_args)
-})
+  return transformer.notEq(_args);
+});
 
 const not = coreFunction(validator.not, (meta, args, ctx, traverse) => {
-  const _args = traverseArgs(args, ctx, traverse)
+  const _args = traverseArgs(args, ctx, traverse);
 
   if (_args.length === 0) {
-    return transformer.false_
+    return transformer.false_;
   }
 
-  return transformer.not(_args[0])
-})
+  return transformer.not(_args[0]);
+});
 
 module.exports = validator => {
   return {
@@ -167,6 +177,7 @@ module.exports = validator => {
     defp: defp(validator),
     when: when(validator),
     notEq: notEq(validator),
-    defnp: defnp(validator)
-  }
-}
+    defnp: defnp(validator),
+    fnCall: fnCall(validator)
+  };
+};
