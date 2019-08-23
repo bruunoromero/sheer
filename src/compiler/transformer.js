@@ -63,7 +63,7 @@ module.exports.def = (node, traverse) => {
 };
 
 module.exports.symbol = node => {
-  return babel.identifier(node.value);
+  return babel.identifier(utils.normalizeName(node.value));
 };
 
 module.exports.if_ = (node, traverse) => {
