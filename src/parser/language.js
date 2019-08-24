@@ -12,8 +12,8 @@ module.exports = P.createLanguage({
       r.Symbol,
       r.List,
       r.Vector,
-      r.Map,
-      r.Set
+      r.Set,
+      r.Map
     );
   },
 
@@ -87,7 +87,7 @@ module.exports = P.createLanguage({
       .many()
       .wrap(P.string("#{"), P.string("}"))
       .mark()
-      .map(t.map);
+      .map(t.set);
   },
 
   File: function(r) {
