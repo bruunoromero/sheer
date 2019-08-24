@@ -3,7 +3,9 @@ const R = require("ramda");
 const path = require("path");
 const cosmiconfig = require("cosmiconfig");
 
-const ENTRY_NAME = "main.cris";
+const utils = require("./utils");
+
+const ENTRY_NAME = `main.${utils.EXT}`;
 
 let _config;
 
@@ -12,8 +14,7 @@ const DEFAULT_CONFIG = {
 };
 
 const searchConfig = () => {
-  const explorer = cosmiconfig("cris");
-  return explorer.searchSync();
+  return cosmiconfig(utils.EXT).searchSync();
 };
 
 const buildConfig = ({ filepath, config, isEmpty }) => {

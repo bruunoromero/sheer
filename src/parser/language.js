@@ -1,5 +1,5 @@
-const P = require("parsimmon")
-const t = require("./transformer")
+const P = require("parsimmon");
+const t = require("./transformer");
 
 module.exports = P.createLanguage({
   Expression: r => {
@@ -14,7 +14,7 @@ module.exports = P.createLanguage({
       r.Vector,
       r.Map,
       r.Set
-    )
+    );
   },
 
   Symbol: () => {
@@ -22,7 +22,7 @@ module.exports = P.createLanguage({
       /[a-zA-Z_\-\+=\.></\\\?\*\|$&][a-zA-Z_\-\+=\.></\\\?\*\|$&0-9]*/
     )
       .mark()
-      .map(t.symbol)
+      .map(t.symbol);
   },
 
   Keyword: r => {
@@ -33,19 +33,19 @@ module.exports = P.createLanguage({
         end,
         value: value.symbol.value
       }))
-      .map(t.keyword)
+      .map(t.keyword);
   },
 
   Number: () => {
     return P.regexp(/-?(0|[1-9][0-9]*)([.][0-9]+)?([eE][+-]?[0-9]+)?/)
       .mark()
-      .map(t.numberLiteral)
+      .map(t.numberLiteral);
   },
 
   String: () => {
     return P.regexp(/"((?:\\.|.)*?)"/, 1)
       .mark()
-      .map(t.stringLiteral)
+      .map(t.stringLiteral);
   },
 
   Null: () =>
@@ -63,7 +63,7 @@ module.exports = P.createLanguage({
       .many()
       .wrap(P.string("("), P.string(")"))
       .mark()
-      .map(t.list)
+      .map(t.list);
   },
 
   Vector: r => {
@@ -71,7 +71,7 @@ module.exports = P.createLanguage({
       .many()
       .wrap(P.string("["), P.string("]"))
       .mark()
-      .map(t.vector)
+      .map(t.vector);
   },
 
   Map: r => {
@@ -79,7 +79,7 @@ module.exports = P.createLanguage({
       .many()
       .wrap(P.string("{"), P.string("}"))
       .mark()
-      .map(t.map)
+      .map(t.map);
   },
 
   Set: r => {
@@ -87,10 +87,10 @@ module.exports = P.createLanguage({
       .many()
       .wrap(P.string("#{"), P.string("}"))
       .mark()
-      .map(t.map)
+      .map(t.map);
   },
 
   File: function(r) {
-    return r.Expression.trim(P.optWhitespace).many()
+    return r.Expression.trim(P.optWhitespace).many();
   }
-})
+});
