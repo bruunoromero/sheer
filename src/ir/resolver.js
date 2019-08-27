@@ -1,5 +1,5 @@
-const t = require("./types")
-const transformer = require("./transformer")
+const t = require("./types");
+const transformer = require("./transformer");
 
 const resolve = (node, ctx) => {
   switch (node.type) {
@@ -7,55 +7,55 @@ const resolve = (node, ctx) => {
     case t.EQ:
     case t.AND:
     case t.NOT_EQ:
-      return resolveBinary(node, ctx)
+      return resolveBinary(node, ctx);
     case t.IF:
-      return resolveIF(node, ctx)
+      return resolveIF(node, ctx);
     case t.VECTOR:
-      return resolveVector(node, ctx)
+      return resolveVector(node, ctx);
     case t.NOT:
-      return resolveNot(node, ctx)
+      return resolveNot(node, ctx);
     case t.SYMBOL:
-      return resolveSymbol(node, ctx)
+      return resolveSymbol(node, ctx);
   }
 
-  return node
-}
+  return node;
+};
 
 const resolveIF = (node, ctx) => {
-  node.cond = resolve(node.cond, ctx)
-  node.truthy = resolve(node.truthy, ctx)
-  node.falsy = resolve(node.falsy, ctx)
+  node.cond = resolve(node.cond, ctx);
+  node.truthy = resolve(node.truthy, ctx);
+  node.falsy = resolve(node.falsy, ctx);
 
-  return node
-}
+  return node;
+};
 
 const resolveBinary = (node, ctx) => {
-  node.left = resolve(node.left, ctx)
-  node.right = resolve(node.right, ctx)
+  node.left = resolve(node.left, ctx);
+  node.right = resolve(node.right, ctx);
 
-  return node
-}
+  return node;
+};
 
 const resolveNot = (node, ctx) => {
-  node.value = resolve(node, ctx)
-  return node
-}
+  node.value = resolve(node, ctx);
+  return node;
+};
 
 const resolveVector = (node, ctx) => {
-  node.value = node.value.map(el => resolve(el, ctx))
-  return node
-}
+  node.value = node.value.map(el => resolve(el, ctx));
+  return node;
+};
 
 const resolveSymbol = (node, ctx) => {
   if (node.type === t.SYMBOL) {
-    const resolved = ctx.resolve(node.value)
+    const resolved = ctx.resolve(node.value);
 
     if (Array.isArray(resolved)) {
-      return transformer.member(resolved)
+      return transformer.member(resolved);
     }
   }
 
-  return node
-}
+  return node;
+};
 
-module.exports = resolve
+module.exports = resolve;
