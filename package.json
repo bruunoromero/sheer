@@ -4,6 +4,7 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
+    "dev:f": "node fugger/index.js",
     "dev": "node src/index.js",
     "test": "jest",
     "lint": "eslint src/** test/**"
@@ -21,6 +22,7 @@
   "devDependencies": {
     "eslint": "^6.2.1",
     "eslint-config-prettier": "^6.1.0",
-    "jest": "^24.8.0"
+    "jest": "^24.8.0",
+    "randexp": "^0.5.3"
   }
 }

@@ -8,6 +8,9 @@ module.exports = parent => {
   const _parent = parent;
 
   return {
+    _defs() {
+      return _defs;
+    },
     name(n) {
       if (n) {
         _name = n;

@@ -52,12 +52,7 @@ module.exports = (filePath, source, config) => {
       presets: ["@babel/preset-env"]
     });
 
-    fs.writeFileSync(
-      "/Users/bruno.barreira/git-repo/cris/compiled.js",
-      generated.code
-    );
-
-    return file(name, filePath, source, intermediate);
+    return generated;
   } catch (e) {
     console.log(e);
   }

@@ -15,6 +15,10 @@ __$$GLOBALS$$__["b"] = function (_PLUS_a_) {
 
 __$$GLOBALS$$__["b"](1, 2, 3);
 
+__$$GLOBALS$$__["a"] = function (b) {
+  return _PLUS_(b, 2);
+};
+
 var _default = __$$GLOBALS$$__;
 exports["default"] = _default;
 module.exports = exports.default;

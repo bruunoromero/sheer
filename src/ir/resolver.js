@@ -59,3 +59,8 @@ const resolveSymbol = (node, ctx) => {
 };
 
 module.exports = resolve;
+module.exports.resolveIf = resolveIF;
+module.exports.resolveNot = resolveNot;
+module.exports.resolveBinary = resolveBinary;
+module.exports.resolveVector = resolveVector;
+module.exports.resolveSymbol = resolveSymbol;
