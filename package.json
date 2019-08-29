@@ -6,7 +6,7 @@
   "scripts": {
     "dev:f": "node fugger/index.js",
     "dev": "node src/index.js",
-    "test": "jest",
+    "test": "jest --coverage",
     "lint": "eslint src/** test/**"
   },
   "dependencies": {
@@ -16,6 +16,7 @@
     "@babel/types": "^7.5.5",
     "babel-plugin-add-module-exports": "^1.0.2",
     "cosmiconfig": "^5.2.1",
+    "escape-string-regexp": "^2.0.0",
     "parsimmon": "^1.13.0",
     "ramda": "^0.26.1"
   },

@@ -29,7 +29,7 @@ const fn = coreFunction(validator.fn, (meta, args, ctx, traverse) => {
   const fCtx = context(ctx);
   const params = traverse(args[0], fCtx);
 
-  params.value.forEach(el => fCtx.addDefinition(el.value));
+  params.value.forEach(el => fCtx.addDefinition(el.value, false, el));
 
   const body = traverseArgs(args.slice(1), fCtx, traverse);
 
@@ -40,15 +40,15 @@ const def = coreFunction(validator.def, (meta, args, ctx, traverse) => {
   const [sym, value] = traverseArgs(args, ctx, traverse);
   const transformed = transformer.def(sym, value);
 
-  ctx.addDefinition(sym.value, true, transformed);
+  ctx.addDefinition(sym.value, true, transformed, true);
 
   return transformed;
 });
 
-const defp = coreFunction(validator.defp, (meta, args, ctx, traverse) => {
+const defp = coreFunction(validator.def, (meta, args, ctx, traverse) => {
   const [sym, value] = traverseArgs(args, ctx, traverse);
   const transformed = transformer.def(sym, value);
-  ctx.addDefinition(sym.value, false, transformed);
+  ctx.addDefinition(sym.value, false, transformed, true);
 
   return transformed;
 });
@@ -59,8 +59,8 @@ const defn = coreFunction(
     const [sym, ...rest] = args;
     const tSym = traverse(sym, ctx);
 
-    const value = fn(validator)(meta, rest, ctx);
-    const transformed = transformer.def(tSym, value);
+    const value = fn(validator)(meta, rest, ctx, traverse);
+    const transformed = transformer.def(sym, value);
 
     ctx.addDefinition(sym.value, true, transformed);
 
@@ -155,10 +155,6 @@ const notEq = coreFunction(validator.ok, (meta, args, ctx, traverse) => {
 
 const not = coreFunction(validator.not, (meta, args, ctx, traverse) => {
   const _args = traverseArgs(args, ctx, traverse);
-
-  if (_args.length === 0) {
-    return transformer.false_;
-  }
 
   return transformer.not(_args[0]);
 });

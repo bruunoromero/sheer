@@ -36,7 +36,7 @@ module.exports.map = ({ start, end, value }) => {
 
 module.exports.stringLiteral = ({ start, end, value }) => {
   return withLocation(start, end, {
-    value: value.slice(1, -1),
+    value: value,
     type: types.STRING
   });
 };
@@ -50,7 +50,7 @@ module.exports.symbol = ({ start, end, value }) => {
 
 module.exports.keyword = ({ start, end, value }) => {
   return withLocation(start, end, {
-    value: value.slice(1),
+    value: value,
     type: types.KEYWORD
   });
 };

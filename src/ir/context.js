@@ -11,6 +11,11 @@ module.exports = parent => {
     _defs() {
       return _defs;
     },
+    root() {
+      if (!_parent) return this;
+
+      return _parent.root();
+    },
     name(n) {
       if (n) {
         _name = n;
@@ -26,7 +31,9 @@ module.exports = parent => {
       return false;
     },
     resolve(name) {
-      if (_defs[name] && !_parent) {
+      if (!_defs[name] && _parent) {
+        return _parent.resolve(name);
+      } else if (_defs[name] && !_parent) {
         return [utils.GLOBALS, name];
       }
 
@@ -45,8 +52,12 @@ module.exports = parent => {
 
       return Object.keys(_defs);
     },
-    addDefinition(name, isExportable, meta) {
-      _defs[name] = meta;
+    addDefinition(name, isExportable, meta, isGlobal) {
+      if (isGlobal) {
+        this.root().addDefinition(name, isExportable, meta);
+      } else {
+        _defs[name] = meta;
+      }
 
       if (isExportable && !_exports.find(n => n === name)) {
         _exports.push(name);

@@ -1,4 +1,1 @@
-(def a 1)
-(def b (fn [+a-] (= +a- 1)))
-(b 1 2 3)
-(defn a [b] (+ b 2))
+(def :a 10)

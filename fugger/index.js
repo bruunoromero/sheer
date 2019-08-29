@@ -1,5 +1,6 @@
 const R = require("ramda");
 const RandExp = require("randexp");
+const escapeStringRegex = require("escape-string-regexp");
 
 const makeRegex = spec => {
   return new RegExp(spec.matches);
@@ -20,9 +21,6 @@ const fuggerSpec = spec => {
 
       return _regx;
     },
-    escape() {
-      return fuggerSpec(R.set(R.lensProp("escaped"), true, _spec));
-    },
     gen() {
       return this.regx().gen();
     },
@@ -39,10 +37,19 @@ const fuggerSpec = spec => {
   };
 };
 
-const fugger = matches => {
-  return fuggerSpec({ matches });
+const regex = matches => {
+  if (matches instanceof RegExp) {
+    return fuggerSpec({ matches });
+  } else if (typeof matches === "string") {
+    return fuggerSpec({ matches: new RegExp(matches) });
+  }
 };
 
-module.exports = fugger;
+const string = matches => {
+  return fuggerSpec({ matches: escapeStringRegex(matches) });
+};
 
-console.log(fugger("[a-z]").wrap(10));
+module.exports = {
+  string,
+  regex
+};

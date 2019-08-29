@@ -84,10 +84,10 @@ describe("tranformer", () => {
 
   describe("stringLiteral", () => {
     it("should take an object with a `value` key, and return a stringLiteral type object", () => {
-      const node1 = { value: '"Hello, World"' };
+      const node1 = { value: "Hello, World" };
       const transformed1 = transformer.stringLiteral(node1);
 
-      const node2 = { value: '"Hello from the other side"' };
+      const node2 = { value: "Hello from the other side" };
       const transformed2 = transformer.stringLiteral(node2);
 
       expect(transformed1.type).toBe(t.STRING);
@@ -116,10 +116,10 @@ describe("tranformer", () => {
 
   describe("keyword", () => {
     it("should take an object with a `value` key, and return a keyword type object", () => {
-      const node1 = { value: ":abc" };
+      const node1 = { value: "abc" };
       const transformed1 = transformer.keyword(node1);
 
-      const node2 = { value: ":def" };
+      const node2 = { value: "def" };
       const transformed2 = transformer.keyword(node2);
 
       expect(transformed1.type).toBe(t.KEYWORD);
