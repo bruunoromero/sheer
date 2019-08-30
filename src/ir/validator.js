@@ -92,13 +92,13 @@ module.exports.defn = (validator, meta, args) => {
 };
 
 module.exports.ns = (validator, meta, args) => {
-  // const EXPECTED_NUM_OF_ARGS = 2
-  // if (args.length !== EXPECTED_NUM_OF_ARGS) {
-  //   validator.addError(
-  //     meta.loc,
-  //     errors.invalidNumberOfArgs("def-", args.length, EXPECTED_NUM_OF_ARGS)
-  //   )
-  // }
+  const EXPECTED_NUM_OF_ARGS = 1;
+  if (args.length < EXPECTED_NUM_OF_ARGS) {
+    validator.addError(
+      meta.loc,
+      errors.atLeastNumberOfArguments("ns", args.length, EXPECTED_NUM_OF_ARGS)
+    );
+  }
 };
 
 module.exports.if_ = (validator, meta, args) => {

@@ -47,8 +47,6 @@ const traverse = node => {
       return transformer.not(node, traverse);
     case t.FN:
       return transformer.fn(node, traverse);
-    case t.EXPORT:
-      return transformer.export(node, traverse);
     case t.MEMBER:
       return transformer.member(node, traverse);
     case t.VECTOR:

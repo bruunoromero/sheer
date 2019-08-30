@@ -54,7 +54,7 @@ const defp = coreFunction(validator.def, (meta, args, ctx, traverse) => {
 });
 
 const defn = coreFunction(
-  validator.def,
+  validator.defn,
   (meta, args, ctx, traverse, validator) => {
     const [sym, ...rest] = args;
     const tSym = traverse(sym, ctx);
@@ -69,7 +69,7 @@ const defn = coreFunction(
 );
 
 const defnp = coreFunction(
-  validator.def,
+  validator.defn,
   (meta, args, ctx, traverse, validator) => {
     const [sym, ...rest] = traverseArgs(args, ctx, traverse);
     const value = fn(validator)(meta, rest, ctx);

@@ -50,8 +50,8 @@ module.exports.fn = (params, body) => {
   };
 };
 
-module.exports.symbol = ({ value, type }) => {
-  return { type, value: value };
+module.exports.symbol = ({ value }) => {
+  return { type: t.SYMBOL, value };
 };
 
 module.exports.if_ = (cond, truthy, falsy) => {
@@ -139,13 +139,6 @@ module.exports.declare = (value, init, isGlobal) => {
     value,
     isGlobal,
     type: t.DECLARE
-  };
-};
-
-module.exports.export = value => {
-  return {
-    value,
-    type: t.EXPORT
   };
 };
 
