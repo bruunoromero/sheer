@@ -1,0 +1,19 @@
+{
+  "name": "@cris/cli",
+  "version": "1.0.0",
+  "main": "src/index.js",
+  "license": "MIT",
+  "scripts": {
+    "dev": "node src/index.js"
+  },
+  "dependencies": {
+    "@cris/lang": "^1.0.0",
+    "babel-plugin-add-module-exports": "^1.0.2",
+    "camelcase": "^5.3.1",
+    "commander": "^3.0.1",
+    "decamelize": "^3.2.0"
+  },
+  "bin": {
+    "cris": "./src/index.js"
+  }
+}

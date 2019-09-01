@@ -158,6 +158,22 @@ module.exports.fnCall = (callee, args) => {
   };
 };
 
+module.exports.list = () => {
+  return {
+    value: [],
+    type: t.VECTOR
+  };
+};
+
+module.exports.require_ = (ns, as, refer) => {
+  return {
+    ns,
+    as,
+    refer,
+    type: t.REQUIRE
+  };
+};
+
 module.exports.eq = eq;
 module.exports.or = or;
 module.exports.and = and;

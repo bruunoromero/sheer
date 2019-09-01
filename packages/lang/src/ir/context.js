@@ -3,6 +3,7 @@ const utils = require("../utils");
 module.exports = parent => {
   let _name = null;
   const _defs = {};
+  const _deps = [];
   const _exports = [];
   const _requires = {};
   const _parent = parent;
@@ -11,10 +12,16 @@ module.exports = parent => {
     _defs() {
       return _defs;
     },
+    deps() {
+      return _deps;
+    },
     root() {
       if (!_parent) return this;
 
       return _parent.root();
+    },
+    isRoot() {
+      return this.root() === this;
     },
     name(n) {
       if (n) {
@@ -31,19 +38,43 @@ module.exports = parent => {
       return false;
     },
     resolve(name) {
+      const [owner, member] = name.split("/");
+      const requires = this.requires();
+      const required = requires[name];
+
+      if (member) {
+        return [owner, member];
+      }
+
       if (!_defs[name] && _parent) {
         return _parent.resolve(name);
       } else if (_defs[name] && !_parent) {
         return [utils.GLOBALS, name];
+      } else if (required) {
+        if (required.isRefer) {
+          if (required.as) {
+            return [required.as.value, name];
+          } else {
+            return [required.ns.value, name];
+          }
+        }
       }
 
       return name;
     },
     exports() {
-      return _exports;
+      if (this.isRoot()) {
+        return _exports;
+      }
+
+      return this.root().exports();
     },
     requires() {
-      return _requires;
+      if (this.isRoot()) {
+        return _requires;
+      }
+
+      return this.root().requires();
     },
     definitions(name) {
       if (name) {
@@ -63,6 +94,25 @@ module.exports = parent => {
         _exports.push(name);
       }
     },
-    addRequirement(name) {}
+    addRequirement(meta) {
+      if (this.isRoot()) {
+        const ns = meta.ns.value;
+        const asOrName = meta.as ? meta.as.value : ns;
+
+        if (!_deps.find(n => n === ns)) {
+          _deps.push(ns);
+        }
+
+        _requires[asOrName] = meta;
+
+        if (meta.refer) {
+          meta.refer.value.map(el => {
+            _requires[el.value] = { ...meta, isRefer: true };
+          });
+        }
+      } else {
+        this.root().addRequirement(name);
+      }
+    }
   };
 };

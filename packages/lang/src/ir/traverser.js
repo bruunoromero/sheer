@@ -1,9 +1,6 @@
 const R = require("ramda");
 
-const context = require("./context");
-const coreOps = require("./core_ops");
 const resolve = require("./resolver");
-const validator = require("./validator");
 const transformer = require("./transformer");
 
 const pt = require("../parser/types");
@@ -41,19 +38,6 @@ const traverse = resolveSymbols((node, ctx, core) => {
   throw new Error(`could not traverse type ${node.type}`);
 });
 
-const traverseAst = (ast, vldt, core) => {
-  const ctx = context();
-  const res = ast.map(node => traverse(node, ctx, core)).filter(e => e);
-
-  const errors = vldt.errors();
-
-  if (errors) {
-    throw errors;
-  }
-
-  return generateDefinitions(ctx).concat(res);
-};
-
 const generateDefinitions = ctx => {
   return ctx
     .definitions()
@@ -70,51 +54,63 @@ const traverseList = (node, ctx, core) => {
   const firstEl = node.value[0];
   const rest = node.value.slice(1);
 
-  const _traverse = traverseWithCore(traverse, core);
+  if (!firstEl) return transformer.list();
+
+  const traverser = traverseWithCore(traverse, core);
+
+  if (firstEl.value[0] === ".") {
+    return core.nativeFnCall(node, rest, ctx, traverser);
+  }
 
   switch (firstEl.value) {
     case "ns":
-      return core.ns(node, rest, ctx, _traverse);
+      return core.ns(node, rest, ctx, traverser);
     case "fn":
-      return core.fn(node, rest, ctx, _traverse);
+      return core.fn(node, rest, ctx, traverser);
     case "def":
-      return core.def(node, rest, ctx, _traverse);
+      return core.def(node, rest, ctx, traverser);
     case "def-":
-      return core.defp(node, rest, ctx, _traverse);
+      return core.defp(node, rest, ctx, traverser);
     case "defn":
-      return core.defn(node, rest, ctx, _traverse);
+      return core.defn(node, rest, ctx, traverser);
     case "defn-":
-      return core.defnp(node, rest, ctx, _traverse);
+      return core.defnp(node, rest, ctx, traverser);
     case "if":
-      return core.if_(node, rest, ctx, _traverse);
+      return core.if_(node, rest, ctx, traverser);
     case "when":
-      return core.when(node, rest, ctx, _traverse);
+      return core.when(node, rest, ctx, traverser);
     case "and":
-      return core.and(node, rest, ctx, _traverse);
+      return core.and(node, rest, ctx, traverser);
     case "or":
-      return core.or(node, rest, ctx, _traverse);
+      return core.or(node, rest, ctx, traverser);
     case "=":
-      return core.eq(node, rest, ctx, _traverse);
+      return core.eq(node, rest, ctx, traverser);
     case "not":
-      return core.not(node, rest, ctx, _traverse);
+      return core.not(node, rest, ctx, traverser);
     case "not=":
-      return core.notEq(node, rest, ctx, _traverse);
+      return core.notEq(node, rest, ctx, traverser);
+    case "require":
+      return core.require_(node, rest, ctx, traverser);
     default:
-      return core.fnCall(node, rest, ctx, _traverse);
+      return core.fnCall(node, rest, ctx, traverser);
   }
 
   throw new Error(`could not traverse type ${node.type}`);
 };
 
-module.exports = (filename, source, ast) => {
-  const vldt = validator(filename, source);
-  const core = coreOps(vldt);
+module.exports = (ast, vldt, core, ctx) => {
+  const res = ast.map(node => traverse(node, ctx, core)).filter(e => e);
 
-  return traverseAst(ast, vldt, core);
+  const errors = vldt.errors();
+
+  if (errors) {
+    throw errors;
+  }
+
+  return generateDefinitions(ctx).concat(res);
 };
 
 module.exports.traverse = traverse;
-module.exports.traverseAst = traverseAst;
 module.exports.traverseList = traverseList;
 module.exports.traverseVector = traverseVector;
 module.exports.generateDefinitions = generateDefinitions;

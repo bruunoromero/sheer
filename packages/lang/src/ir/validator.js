@@ -101,6 +101,18 @@ module.exports.ns = (validator, meta, args) => {
   }
 };
 
+module.exports.require_ = (validator, meta, args) => {
+  const EXPECTED_NUM_OF_ARGS = 1;
+  if (args.length !== EXPECTED_NUM_OF_ARGS) {
+    validator.addError(
+      meta.loc,
+      errors.invalidNumberOfArgs("require", args.length, EXPECTED_NUM_OF_ARGS)
+    );
+  }
+
+  return invalidTypeProvided(validator, "require", args[0], pt.VECTOR);
+};
+
 module.exports.if_ = (validator, meta, args) => {
   const EXPECTED_NUM_OF_ARGS = 3;
   if (args.length !== EXPECTED_NUM_OF_ARGS) {

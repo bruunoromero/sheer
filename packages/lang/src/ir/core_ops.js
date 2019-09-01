@@ -59,9 +59,13 @@ const defn = coreFunction(
     const [sym, ...rest] = args;
     const tSym = traverse(sym, ctx);
 
+    //PLACING A PLACEHOLDER ON THE CONTEXT, SO IT REFERENCES CORRECTLY
+    ctx.addDefinition(sym.value, true, true);
+
     const value = fn(validator)(meta, rest, ctx, traverse);
     const transformed = transformer.def(sym, value);
 
+    //RE-PLACING THE PLACEHOLDER ON THE CONTEXT WITH THE CORRECT VALUE
     ctx.addDefinition(sym.value, true, transformed);
 
     return transformed;
@@ -82,7 +86,10 @@ const defnp = coreFunction(
 );
 
 const ns = coreFunction(validator.ns, (meta, args, ctx, traverse) => {
-  const [sym] = traverseArgs(args, ctx, traverse);
+  const [sym, ...rest] = traverseArgs(args, ctx, traverse);
+  const extra = utils.chunks(rest, 2);
+
+  console.log(extra);
 
   ctx.name(sym.value);
 });
@@ -159,6 +166,42 @@ const not = coreFunction(validator.not, (meta, args, ctx, traverse) => {
   return transformer.not(_args[0]);
 });
 
+const require_ = coreFunction(
+  validator.require_,
+  (meta, args, ctx, traverse, vldt) => {
+    const [ns, ...rest] = traverse(args[0], ctx).value;
+    const grouppedRest = utils.chunks(rest, 2);
+
+    const maybeAs = grouppedRest.filter(group => group[0].value === "as")[0];
+    const maybeRefer = grouppedRest.filter(
+      group => group[0].value === "refer"
+    )[0];
+
+    const as = maybeAs ? maybeAs[1] : null;
+    const refer = maybeRefer ? maybeRefer[1] : null;
+
+    const transformed = transformer.require_(ns, as, refer);
+
+    ctx.addRequirement(transformed);
+
+    return transformed;
+  }
+);
+
+const nativeFnCall = coreFunction(
+  validator.ok,
+  (meta, args, ctx, traverse, vldt) => {
+    const fnCall = meta.value[0];
+    const callee = traverse(args[0], ctx);
+    const member = transformer.member([callee.value, fnCall.value.slice(1)]);
+
+    return transformer.fnCall(
+      member,
+      traverseArgs(args.slice(1), ctx, traverse)
+    );
+  }
+);
+
 module.exports = validator => {
   return {
     ns: ns(validator),
@@ -174,6 +217,8 @@ module.exports = validator => {
     when: when(validator),
     notEq: notEq(validator),
     defnp: defnp(validator),
-    fnCall: fnCall(validator)
+    fnCall: fnCall(validator),
+    require_: require_(validator),
+    nativeFnCall: nativeFnCall(validator)
   };
 };

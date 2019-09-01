@@ -52,6 +52,8 @@ const resolveSymbol = (node, ctx) => {
 
     if (Array.isArray(resolved)) {
       return transformer.member(resolved);
+    } else {
+      return transformer.symbol({ value: resolved });
     }
   }
 

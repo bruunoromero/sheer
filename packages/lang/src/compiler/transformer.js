@@ -25,13 +25,17 @@ module.exports.number = node => {
   return babel.numericLiteral(node.value);
 };
 
+module.exports.string = node => {
+  return babel.stringLiteral(node.value);
+};
+
 module.exports.declare = (node, traverse) => {
   if (node.isGlobal) {
     return babel.assignmentExpression(
       "=",
       babel.memberExpression(
-        babel.identifier(utils.GLOBALS),
-        babel.stringLiteral(node.value),
+        babel.identifier(utils.normalizeName(utils.GLOBALS)),
+        babel.stringLiteral(utils.normalizeName(node.value)),
         true
       ),
       traverse(node.init)
@@ -136,6 +140,17 @@ module.exports.export = (node, traverse) => {
       )
     ]),
     []
+  );
+};
+
+module.exports.require_ = (node, traverse, config) => {
+  const filePath = utils.nameToPath(node.ns.value, config);
+  const name = traverse(node.ns, config);
+  const as = node.as ? traverse(node.as, config) : null;
+
+  return babel.importDeclaration(
+    [babel.importDefaultSpecifier(as || name)],
+    babel.stringLiteral(filePath)
   );
 };
 

@@ -19,7 +19,7 @@ module.exports = P.createLanguage({
 
   Symbol: () => {
     return P.regexp(
-      /[a-zA-Z_\-\+=\.></\\\?\*\|$&][a-zA-Z_\-\+=\.></\\\?\*\|$&0-9]*/
+      /[a-zA-Z_\-\+=\.></\\\?\*\|$&!][a-zA-Z_\-\+=\.></\\\?\*\|$&!0-9]*/
     )
       .mark()
       .map(t.symbol);

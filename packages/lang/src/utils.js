@@ -1,7 +1,13 @@
 const path = require("path");
 
 const EXT = "cris";
+const OUT_EXT = "js";
 const GLOBALS = "__$$GLOBALS$$__";
+
+const rootFolder = ({ rootSource, outSource }, itOut) =>
+  itOut ? outSource : rootSource;
+
+const ext = isOut => (isOut ? OUT_EXT : EXT);
 
 const pathNoExt = filePath => {
   const ext = path.extname(filePath);
@@ -19,17 +25,21 @@ module.exports.chunks = (array, chunkSize) => {
   return res;
 };
 
-module.exports.pathToName = (filePath, { rootSource }) => {
+module.exports.pathToName = (filePath, config, isOut) => {
   const nonExt = pathNoExt(filePath);
 
   return nonExt
-    .replace(rootSource + path.sep, "")
+    .replace(rootFolder(config, isOut) + path.sep, "")
     .split(path.sep)
     .join(".");
 };
 
-module.exports.nameToPath = (name, { rootSource }) => {
-  return `${path.resolve(rootSource, name.split(".").join(path.sep))}.${EXT}`;
+module.exports.nameToPath = (name, config, isOut) => {
+  const root = rootFolder(config, isOut);
+
+  const fileName = path.resolve(root, name.split(".").join(path.sep));
+
+  return `${fileName}.${ext(isOut)}`;
 };
 
 module.exports.normalizeName = name => {
@@ -65,5 +75,6 @@ module.exports.unnormalizeName = name => {
 };
 
 module.exports.EXT = EXT;
+module.exports.OUT_EXT = OUT_EXT;
 module.exports.GLOBALS = GLOBALS;
 module.exports.pathNoExt = pathNoExt;

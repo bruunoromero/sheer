@@ -1,0 +1,31 @@
+{
+  "name": "@cris/lang",
+  "version": "1.0.0",
+  "main": "src/index.js",
+  "license": "MIT",
+  "scripts": {
+    "dev:f": "node fugger/index.js",
+    "dev": "node src/index.js",
+    "test": "jest --coverage",
+    "lint": "eslint src/** test/**"
+  },
+  "dependencies": {
+    "@babel/code-frame": "^7.5.5",
+    "@babel/core": "^7.5.5",
+    "@babel/preset-env": "^7.5.5",
+    "@babel/types": "^7.5.5",
+    "babel-plugin-add-module-exports": "^1.0.2",
+    "camelcase": "^5.3.1",
+    "cosmiconfig": "^5.2.1",
+    "escape-string-regexp": "^2.0.0",
+    "parsimmon": "^1.13.0",
+    "ramda": "^0.26.1"
+  },
+  "devDependencies": {
+    "eslint": "^6.2.1",
+    "eslint-config-prettier": "^6.1.0",
+    "jest": "^24.8.0",
+    "proxy-polyfill": "^0.3.0",
+    "randexp": "^0.5.3"
+  }
+}

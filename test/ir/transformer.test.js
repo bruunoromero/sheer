@@ -1,12 +1,13 @@
 const transformer = require("../../src/ir/transformer");
-
-const dummyNumber = { loc: {}, type: "NUMBER", value: 1 };
-const dummyVector = { loc: {}, type: "VECTOR", value: [] };
-const dummyString = { loc: {}, type: "STRING", value: "a" };
-const dummySymbolA = { loc: {}, type: "SYMBOL", value: "a" };
-const dummySymbolB = { loc: {}, type: "SYMBOL", value: "b" };
-const dummySymbolC = { loc: {}, type: "SYMBOL", value: "c" };
-const dummyKeyword = { loc: {}, type: "KEYWORD", value: "a" };
+const {
+  dummyNumber,
+  dummyVector,
+  dummyString,
+  dummySymbolA,
+  dummySymbolB,
+  dummySymbolC,
+  dummyKeyword
+} = require("../../mocks/parser/nodes");
 
 describe("transformer", () => {
   describe("primitive", () => {

@@ -1,12 +1,14 @@
 const validator = require("../../src/ir/validator");
+const {
+  dummyNumber,
+  dummyVector,
+  dummyString,
+  dummySymbol,
+  dummyKeyword
+} = require("../../mocks/parser/nodes");
 
-const dummyMeta = {};
-const dummyValidator = { addError: () => {} };
-const dummySymbol = { loc: {}, type: "SYMBOL", value: "a" };
-const dummyString = { loc: {}, type: "STRING", value: "a" };
-const dummyKeyword = { loc: {}, type: "KEYWORD", value: "a" };
-const dummyNumber = { loc: {}, type: "NUMBER", value: 1 };
-const dummyVector = { loc: {}, type: "VECTOR", value: [] };
+const { dummyMeta } = require("../../mocks/ir/nodes");
+const dummyValidator = require("../../mocks/ir/validator");
 
 describe("validator", () => {
   describe("def", () => {
