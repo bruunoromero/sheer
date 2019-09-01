@@ -7,7 +7,7 @@ const transformer = require("./transformer");
 module.exports = (ir, config) => {
   const langCore = babel.importDeclaration(
     [babel.importNamespaceSpecifier(babel.identifier(utils.CORE))],
-    babel.stringLiteral("@cris/lang/core")
+    babel.stringLiteral(`@${utils.EXT}/lang/core`)
   );
 
   const globals = babel.variableDeclaration("const", [

@@ -40,7 +40,7 @@ const fn = coreFunction(validator.fn, (meta, args, ctx, traverse) => {
 const def = coreFunction(validator.def, (meta, args, ctx, traverse) => {
   const [sym, value] = traverseArgs(args, ctx, traverse);
   const transformed = transformer.def(sym, value);
-
+  
   ctx.addDefinition(sym.value, true, transformed, true);
 
   return transformed;

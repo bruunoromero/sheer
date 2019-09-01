@@ -64,10 +64,12 @@ module.exports.when = (cond, truthy) => {
 };
 
 module.exports.def = (sym, expr) => {
+  const name = sym.value || sym.member;
+  
   return {
-    type: t.DEF,
-    name: sym.value,
-    value: expr
+    name,
+    value: expr,
+    type: t.DEF
   };
 };
 

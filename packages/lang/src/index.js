@@ -6,6 +6,7 @@ const project = require("./project");
 const ir = require("./ir");
 const utils = require("./utils");
 const parse = require("./parser");
+
 const compile = require("./compiler");
 
 const dependency = require("./dependency");
@@ -14,6 +15,7 @@ const compileToIr = (path, depGraph, config) => {
   try {
     const source = loader.loadFile(path);
     const program = parse(source);
+
     const file = ir(path, source, program);
 
     depGraph.addFile(file);
@@ -61,7 +63,7 @@ module.exports = () => {
         loader.writeFile(filePath, file.compiled.code);
       });
   } catch (e) {
-    if (typeof e === "string") console.log(e);
+    console.log(e);
     process.exit();
   }
 };

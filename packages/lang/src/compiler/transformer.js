@@ -173,9 +173,9 @@ module.exports.export = (node, traverse) => {
 
 module.exports.require_ = (node, traverse, config) => {
   const filePath = utils.nameToPath(node.ns.value, config, true);
+  
   const name = traverse(node.ns, config);
   const as = node.as ? traverse(node.as, config) : null;
-
   return babel.importDeclaration(
     [babel.importDefaultSpecifier(as || name)],
     babel.stringLiteral(filePath)

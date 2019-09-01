@@ -1,14 +1,23 @@
+const fs = require("fs");
 const path = require("path");
 
-const EXT = "cris";
+const EXT = "yall";
 const OUT_EXT = "js";
 const GLOBALS = "__$$GLOBALS$$__";
-const CORE = "__$$CRIS_LANG_CORE$$__";
+const CORE = "__$$YALL_LANG_CORE$$__";
 
-const rootFolder = ({ rootSource, outSource }, itOut) =>
+const MODULES_FOLDER = `${EXT}_stuff`;
+
+const fsName = name => name.split(".").join(path.sep);
+
+const sourceFolder = ({ rootSource, outSource }, itOut) =>
   itOut ? outSource : rootSource;
 
 const ext = isOut => (isOut ? OUT_EXT : EXT);
+
+const addExt = (filePath, isOut) => {
+  return `${filePath}.${ext(isOut)}`;
+};
 
 const pathNoExt = filePath => {
   const ext = path.extname(filePath);
@@ -30,17 +39,28 @@ module.exports.pathToName = (filePath, config, isOut) => {
   const nonExt = pathNoExt(filePath);
 
   return nonExt
-    .replace(rootFolder(config, isOut) + path.sep, "")
+    .replace(sourceFolder(config, isOut) + path.sep, "")
     .split(path.sep)
     .join(".");
 };
 
 module.exports.nameToPath = (name, config, isOut) => {
-  const root = rootFolder(config, isOut);
+  if (!isOut && config.projectRoot) {
+    const modules = path.resolve(
+      config.projectRoot,
+      MODULES_FOLDER,
+      fsName(name)
+    );
 
-  const fileName = path.resolve(root, name.split(".").join(path.sep));
+    const depPath = addExt(modules, isOut);
 
-  return `${fileName}.${ext(isOut)}`;
+    if (fs.existsSync(depPath)) return depPath;
+  }
+
+  const source = sourceFolder(config, isOut);
+  const fileName = path.resolve(source, fsName(name));
+
+  return addExt(fileName, isOut);
 };
 
 module.exports.normalizeName = name => {
@@ -79,4 +99,6 @@ module.exports.EXT = EXT;
 module.exports.CORE = CORE;
 module.exports.OUT_EXT = OUT_EXT;
 module.exports.GLOBALS = GLOBALS;
+module.exports.MODULES_FOLDER = MODULES_FOLDER;
+
 module.exports.pathNoExt = pathNoExt;

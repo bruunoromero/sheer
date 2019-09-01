@@ -84,11 +84,11 @@ describe("utils", () => {
   describe("nameToPath", () => {
     it("should take a name and object with the `rootSource` key, and returns the path of that name", () => {
       expect(utils.nameToPath("b.c.d", { rootSource: "a" })).toBe(
-        path.resolve("a/b/c/d.cris")
+        path.resolve("a/b/c/d.yall")
       );
 
       expect(utils.nameToPath("lang.core", { rootSource: "src" })).toBe(
-        path.resolve("src/lang/core.cris")
+        path.resolve("src/lang/core.yall")
       );
     });
   });

@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 const program = require("commander");
-const compiler = require("@cris/lang");
+const compiler = require("@yall/lang");
 
 const run = require("./run");
 const create = require("./create");

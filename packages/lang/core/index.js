@@ -1,3 +1,5 @@
+// Utils
+
 const curry = f => {
   function currify() {
     const args = Array.prototype.slice.call(arguments);
@@ -9,6 +11,8 @@ const curry = f => {
 
   return currify;
 };
+
+// Arithmetic Operations
 
 module.exports.add = curry((...els) => {
   return els.reduce((a, b) => a + b);
@@ -36,6 +40,24 @@ module.exports.notEq = curry((l, r) => {
 
 module.exports.not = curry(v => {
   return !v;
+});
+
+// Interop
+
+module.exports.instaciate = curry((Cls, args) => {
+  return new (Cls.bind.apply(Cls, args))();
+});
+
+module.exports.isInstance = curry((Cls, v) => {
+  return v instanceof Cls;
+});
+
+module.exports.r = curry(pattern => {
+  return new RegExp(pattern);
+});
+
+module.exports.type = curry(v => {
+  return typeof v;
 });
 
 module.exports.curry = curry;

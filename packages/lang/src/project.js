@@ -33,8 +33,9 @@ const buildConfig = ({ filepath, config, isEmpty }) => {
   return {
     outSource,
     rootSource,
-    mainPath: mainPath(merdedConfig, { rootSource }),
-    entryCompiled: mainPath(merdedConfig, { outSource }, true)
+    projectRoot,
+    mainPath: mainPath(merdedConfig, { rootSource, projectRoot }),
+    entryCompiled: mainPath(merdedConfig, { outSource, projectRoot }, true)
   };
 };
 
