@@ -1,0 +1,7 @@
+(ns tests.yall.core)
+
+(describe "" 
+  (fn []
+    (it "a"
+      (fn []
+        (log! "ola mundo")))))
