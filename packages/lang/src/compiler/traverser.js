@@ -23,7 +23,12 @@ module.exports = (ir, config) => {
 
   const body = [langCore]
     .concat([globals])
-    .concat(ir.map(node => traverse(node, config)).map(transformer.statement))
+    .concat(
+      ir
+        .map(node => traverse(node, config))
+        .filter(e => e)
+        .map(transformer.statement)
+    )
     .concat([exportGlobals]);
 
   return babel.program(body, [], "module");

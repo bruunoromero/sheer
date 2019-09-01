@@ -1,3 +1,5 @@
+const fs = require("fs");
+const path = require("path");
 const rimraf = require("rimraf");
 
 const loader = require("./loader");
@@ -44,20 +46,35 @@ const loadFromDeps = (deps, depGraph, config) => {
   loadFromDeps(toLoadDeps, depGraph, config);
 };
 
+const loadFolder = (folderName, depGraph, config) => {
+  if (!fs.existsSync(folderName)) return;
+
+  const allInFolder = fs
+    .readdirSync(folderName)
+    .map(p => path.join(folderName, p));
+
+  const folders = allInFolder.filter(path => fs.lstatSync(path).isDirectory());
+
+  const files = allInFolder
+    .filter(path => !fs.lstatSync(path).isDirectory())
+    .forEach(path => compileToIr(path, depGraph, config));
+
+  folders.forEach(folder => loadFolder(folder, depGraph, config));
+};
+
 module.exports = () => {
   const config = project.loadConfig();
   const depGraph = dependency(config);
 
   try {
-    const entry = compileToIr(config.mainPath, depGraph, config);
-
-    loadFromDeps(entry.deps(), depGraph, config);
+    loadFolder(config.rootSource, depGraph, config);
+    loadFolder(config.rootModules, depGraph, config);
 
     rimraf.sync(config.outSource);
 
     const files = depGraph
       .files()
-      .map(([ns, file]) => [ns, compile(file, config)])
+      .map(([ns, file]) => [ns, compile(file, ns, config)])
       .forEach(([ns, file]) => {
         const filePath = utils.nameToPath(ns, config, true);
         loader.writeFile(filePath, file.compiled.code);

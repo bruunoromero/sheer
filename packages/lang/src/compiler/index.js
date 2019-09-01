@@ -8,9 +8,9 @@ const parse = require("../parser");
 const preset = require("./preset");
 const traverse = require("./traverser");
 
-module.exports = (file, config) => {
+module.exports = (file, ns, config) => {
   const generated = babelCore.transformFromAst(
-    traverse(file.program(), config),
+    traverse(file.program(), { ns, ...config }),
     null,
     {
       presets: [preset]

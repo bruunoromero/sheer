@@ -1,3 +1,4 @@
+const path = require("path");
 const babel = require("@babel/types");
 
 const utils = require("../utils");
@@ -173,12 +174,16 @@ module.exports.export = (node, traverse) => {
 
 module.exports.require_ = (node, traverse, config) => {
   const filePath = utils.nameToPath(node.ns.value, config, true);
+  const currentPath = utils.nameToPath(config.ns, config, true);
+  const resolvedPath = path.relative(currentPath, filePath).slice(1);
   
+  if (!resolvedPath) return;
+
   const name = traverse(node.ns, config);
   const as = node.as ? traverse(node.as, config) : null;
   return babel.importDeclaration(
     [babel.importDefaultSpecifier(as || name)],
-    babel.stringLiteral(filePath)
+    babel.stringLiteral(resolvedPath)
   );
 };
 

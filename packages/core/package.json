@@ -3,7 +3,17 @@
   "version": "1.0.0",
   "main": "index.js",
   "license": "MIT",
+  "scripts": {
+    "test": "yall c && jest"
+  },
   "dependencies": {
     "@yall/lang": "^1.0.0"
+  },
+  "jest": {
+    "testRegex": "./out/tests/.*.js$",
+    "rootDir": "."
+  },
+  "devDependencies": {
+    "jest": "^24.9.0"
   }
 }

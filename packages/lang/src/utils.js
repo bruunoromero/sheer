@@ -53,7 +53,6 @@ module.exports.nameToPath = (name, config, isOut) => {
     );
 
     const depPath = addExt(modules, isOut);
-
     if (fs.existsSync(depPath)) return depPath;
   }
 

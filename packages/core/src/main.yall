@@ -1,1 +1,3 @@
 (ns main)  
+
+(log! "ola mundo")

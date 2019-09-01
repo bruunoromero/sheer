@@ -56,6 +56,24 @@ module.exports.r = curry(pattern => {
   return new RegExp(pattern);
 });
 
+module.exports.tryCatch = curry((toTry, toCatch) => {
+  try {
+    return toTry();
+  } catch (e) {
+    return toCatch(e);
+  }
+});
+
+module.exports.discard = curry(fn => {
+  return (...args) => {
+    fn(...args);
+  };
+});
+
+module.exports.raise = curry(err => {
+  throw err;
+});
+
 module.exports.type = curry(v => {
   return typeof v;
 });

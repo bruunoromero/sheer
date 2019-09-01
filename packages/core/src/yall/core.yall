@@ -20,7 +20,7 @@
 
 (defn join [d coll]
   (.join coll d))
-  
+
 ;; Utils
 
 (def curry lang.core/curry)
@@ -28,14 +28,24 @@
 (defn -> [x & fns]
   (reduce-init (fn [v f] (f v)) fns x))
 
+;; Strings
+
+(defn split [d s]
+  (.split s d))
+
 ;; Interop
 
 (def r lang.core/r)
 (def type lang.core/type)
+(def raise lang.core/raise)
+(def try lang.core/tryCatch)
 (def log! (curry (:log console)))
 
 (defn new [c & args]
   (lang.core/instaciate c args))
+
+(def discard lang.core/discard)
+
 
 ;; Arithmetic Operations
 

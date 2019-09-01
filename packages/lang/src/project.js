@@ -29,11 +29,13 @@ const buildConfig = ({ filepath, config, isEmpty }) => {
 
   const outSource = path.join(projectRoot, merdedConfig.out);
   const rootSource = path.join(projectRoot, merdedConfig.src);
+  const rootModules = path.join(projectRoot, utils.MODULES_FOLDER);
 
   return {
     outSource,
     rootSource,
     projectRoot,
+    rootModules,
     mainPath: mainPath(merdedConfig, { rootSource, projectRoot }),
     entryCompiled: mainPath(merdedConfig, { outSource, projectRoot }, true)
   };

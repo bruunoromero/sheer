@@ -18,7 +18,7 @@ module.exports = P.createLanguage({
   },
 
   NotNewline: () => P.regexp(/[^\n]*/),
-  _: r => r.Comment.sepBy(P.whitespace).trim(P.optWhitespace),
+  _: r => r.Comment.sepBy(P.optWhitespace).trim(P.optWhitespace),
   Comment: r => r.NotNewline.wrap(P.string(";"), P.string("\n")),
 
   Symbol: () => {
