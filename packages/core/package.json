@@ -1,0 +1,9 @@
+{
+  "name": "@cris/core",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "dependencies": {
+    "@cris/lang": "^1.0.0"
+  }
+}

@@ -82,25 +82,17 @@ module.exports.null_ = () => {
   return babel.nullLiteral();
 };
 
-module.exports.and = (node, traverse) => {
+module.exports.logOp = (node, traverse) => {
   return babel.logicalExpression(
-    "&&",
+    node.op,
     traverse(node.left),
     traverse(node.right)
   );
 };
 
-module.exports.eq = (node, traverse) => {
+module.exports.binOp = (node, traverse) => {
   return babel.binaryExpression(
-    "===",
-    traverse(node.left),
-    traverse(node.right)
-  );
-};
-
-module.exports.notEq = (node, traverse) => {
-  return babel.binaryExpression(
-    "!==",
+    node.op,
     traverse(node.left),
     traverse(node.right)
   );
@@ -111,15 +103,23 @@ module.exports.not = (node, traverse) => {
 };
 
 module.exports.fn = (node, traverse) => {
-  return babel.functionExpression(
-    null,
-    node.params.map(traverse),
-    babel.blockStatement(
-      node.body
-        .map(traverse)
-        .map(returnLast)
-        .map(statement)
-    )
+  return babel.callExpression(
+    babel.memberExpression(
+      babel.identifier(utils.CORE),
+      babel.identifier("curry")
+    ),
+    [
+      babel.functionExpression(
+        null,
+        node.params.map(traverse),
+        babel.blockStatement(
+          node.body
+            .map(traverse)
+            .map(returnLast)
+            .map(statement)
+        )
+      )
+    ]
   );
 };
 

@@ -1,15 +1,13 @@
 module.exports = {
   FN: "FN",
   IF: "IF",
-  EQ: "EQ",
-  OR: "OR",
-  AND: "AND",
   NOT: "NOT",
   DEF: "DEF",
   NULL: "NULL",
   BOOL: "BOOL",
+  BIN_OP: "BIN_OP",
+  LOG_OP: "LOG_OP",
   MEMBER: "MEMBER",
-  NOT_EQ: "NOT_EQ",
   NUMBER: "NUMBER",
   STRING: "STRING",
   SYMBOL: "SYMBOL",
@@ -18,7 +16,5 @@ module.exports = {
   IMPORT: "IMPORT",
   REQUIRE: "REQUIRE",
   DECLARE: "DECLARE",
-  FN_CALL: "FN_CALL",
-  REQUIRE_AS: "REQUIRE_AS",
-  REQUIRE_REFER: "REQUIRE_REFER"
+  FN_CALL: "FN_CALL"
 };

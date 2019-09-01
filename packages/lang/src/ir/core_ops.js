@@ -116,7 +116,7 @@ const and = coreFunction(validator.ok, (meta, args, ctx, traverse) => {
     return _args[0];
   }
 
-  return transformer.and(_args);
+  return transformer.logOp(_args, "&&");
 });
 
 const or = coreFunction(validator.ok, (meta, args, ctx, traverse) => {
@@ -129,7 +129,21 @@ const or = coreFunction(validator.ok, (meta, args, ctx, traverse) => {
     return _args[0];
   }
 
-  return transformer.or(_args);
+  return transformer.logOp(_args, "||");
+});
+
+const add = coreFunction(validator.ok, (meta, args, ctx, traverse) => {
+  const _args = traverseArgs(args, ctx, traverse);
+
+  if (_args.length === 0) {
+    return transformer.true_;
+  }
+
+  if (_args.length === 1) {
+    return _args[0];
+  }
+
+  return transformer.binOp(_args, "+", true);
 });
 
 const eq = coreFunction(validator.ok, (meta, args, ctx, traverse) => {
@@ -143,7 +157,7 @@ const eq = coreFunction(validator.ok, (meta, args, ctx, traverse) => {
     return _args[0];
   }
 
-  return transformer.eq(_args);
+  return transformer.binOp(_args, "===");
 });
 
 const notEq = coreFunction(validator.ok, (meta, args, ctx, traverse) => {
@@ -157,7 +171,7 @@ const notEq = coreFunction(validator.ok, (meta, args, ctx, traverse) => {
     return _args[0];
   }
 
-  return transformer.notEq(_args);
+  return transformer.binOp(_args, "!==");
 });
 
 const not = coreFunction(validator.not, (meta, args, ctx, traverse) => {
@@ -208,6 +222,7 @@ module.exports = validator => {
     fn: fn(validator),
     or: or(validator),
     eq: eq(validator),
+    add: add(validator),
     if_: if_(validator),
     def: def(validator),
     and: and(validator),

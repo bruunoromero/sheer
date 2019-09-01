@@ -5,6 +5,11 @@ const utils = require("../utils");
 const transformer = require("./transformer");
 
 module.exports = (ir, config) => {
+  const langCore = babel.importDeclaration(
+    [babel.importNamespaceSpecifier(babel.identifier(utils.CORE))],
+    babel.stringLiteral("@cris/lang/core")
+  );
+
   const globals = babel.variableDeclaration("const", [
     babel.variableDeclarator(
       babel.identifier(utils.GLOBALS),
@@ -16,7 +21,8 @@ module.exports = (ir, config) => {
     babel.identifier(utils.GLOBALS)
   );
 
-  const body = [globals]
+  const body = [langCore]
+    .concat([globals])
     .concat(ir.map(node => traverse(node, config)).map(transformer.statement))
     .concat([exportGlobals]);
 
@@ -39,12 +45,10 @@ const traverse = (node, config) => {
       return transformer.symbol(node, traverse);
     case t.NULL:
       return transformer.null_(node, traverse);
-    case t.AND:
-      return transformer.and(node, traverse);
-    case t.EQ:
-      return transformer.eq(node, traverse);
-    case t.NOT_EQ:
-      return transformer.notEq(node, traverse);
+    case t.BIN_OP:
+      return transformer.binOp(node, traverse);
+    case t.LOG_OP:
+      return transformer.logOp(node, traverse);
     case t.NOT:
       return transformer.not(node, traverse);
     case t.FN:

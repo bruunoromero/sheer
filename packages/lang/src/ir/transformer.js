@@ -7,10 +7,10 @@ const manyOp = (args, op) => {
 
   const eqs = els.map((el, i) => {
     const sEl = sEls[i];
-    return op([el, sEl]);
+    return binOp([el, sEl], op);
   });
 
-  return and(eqs);
+  return logOp(eqs, "&&");
 };
 
 const true_ = {
@@ -70,57 +70,41 @@ module.exports.def = (sym, expr) => {
   };
 };
 
-const and = args => {
+const logOp = (args, op) => {
   if (args.length > 2) {
     return {
-      type: t.AND,
+      op,
+      type: t.LOG_OP,
       left: args[0],
-      right: and(args.slice(1))
+      right: logOp(args.slice(1), op)
     };
   }
 
   return {
-    type: t.AND,
+    op,
+    type: t.LOG_OP,
     left: args[0],
     right: args[1]
   };
 };
 
-const or = args => {
+const binOp = (args, op, notJoining) => {
   if (args.length > 2) {
-    return {
-      type: t.OR,
-      left: args[0],
-      right: or(args.slice(1))
-    };
+    if (notJoining) {
+      return {
+        op,
+        type: t.LOG_OP,
+        left: args[0],
+        right: binOp(args.slice(1), op, notJoining)
+      };
+    }
+
+    return manyOp(args, op);
   }
 
   return {
-    type: t.OR,
-    left: args[0],
-    right: args[1]
-  };
-};
-
-const eq = args => {
-  if (args.length > 2) {
-    return manyOp(args, eq);
-  }
-
-  return {
-    type: t.EQ,
-    left: args[0],
-    right: args[1]
-  };
-};
-
-const notEq = args => {
-  if (args.length > 2) {
-    return manyOp(args, notEq);
-  }
-
-  return {
-    type: t.NOT_EQ,
+    op,
+    type: t.BIN_OP,
     left: args[0],
     right: args[1]
   };
@@ -174,10 +158,8 @@ module.exports.require_ = (ns, as, refer) => {
   };
 };
 
-module.exports.eq = eq;
-module.exports.or = or;
-module.exports.and = and;
-module.exports.notEq = notEq;
+module.exports.logOp = logOp;
+module.exports.binOp = binOp;
 module.exports.null_ = null_;
 module.exports.true_ = true_;
 module.exports.false_ = false_;

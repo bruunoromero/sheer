@@ -63,6 +63,8 @@ const traverseList = (node, ctx, core) => {
   }
 
   switch (firstEl.value) {
+    case "+":
+      return core.add(node, rest, ctx, traverser);
     case "ns":
       return core.ns(node, rest, ctx, traverser);
     case "fn":

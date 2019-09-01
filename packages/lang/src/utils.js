@@ -2,6 +2,7 @@ const path = require("path");
 
 const EXT = "cris";
 const OUT_EXT = "js";
+const CORE = "__$$CRIS_CORE$$__";
 const GLOBALS = "__$$GLOBALS$$__";
 
 const rootFolder = ({ rootSource, outSource }, itOut) =>
@@ -75,6 +76,7 @@ module.exports.unnormalizeName = name => {
 };
 
 module.exports.EXT = EXT;
+module.exports.CORE = CORE;
 module.exports.OUT_EXT = OUT_EXT;
 module.exports.GLOBALS = GLOBALS;
 module.exports.pathNoExt = pathNoExt;

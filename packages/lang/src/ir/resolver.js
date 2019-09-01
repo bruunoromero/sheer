@@ -3,10 +3,8 @@ const transformer = require("./transformer");
 
 const resolve = (node, ctx) => {
   switch (node.type) {
-    case t.OR:
-    case t.EQ:
-    case t.AND:
-    case t.NOT_EQ:
+    case t.BIN_OP:
+    case t.LOG_OP:
       return resolveBinary(node, ctx);
     case t.IF:
       return resolveIF(node, ctx);

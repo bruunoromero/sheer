@@ -1,0 +1,6 @@
+{
+  "name": "core",
+  "src": "src",
+  "out": "out",
+  "version": "0.0.1"
+}

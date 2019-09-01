@@ -1,0 +1,7 @@
+(defn map [f coll]
+  (.map coll f))
+
+(def mapper (map (fn [x] (+ x 2))))
+
+(.log console (mapper [1 2 3]))
+
