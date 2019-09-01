@@ -13,6 +13,9 @@ const resolveSymbols = fn => (node, ctx, core) => {
   }
 };
 
+const traverseArgs = (args, ctx, traverse) =>
+  args.map(el => traverse(el, ctx)).filter(e => e);
+
 const traverseWithCore = (traverse, core) => {
   const curriedTraverse = R.curry(traverse);
 
@@ -58,6 +61,10 @@ const traverseList = (node, ctx, core) => {
 
   const traverser = traverseWithCore(traverse, core);
 
+  if (firstEl.type === pt.KEYWORD) {
+    return core.keywordCall(node, rest, ctx, traverser);
+  }
+
   if (firstEl.value[0] === ".") {
     return core.nativeFnCall(node, rest, ctx, traverser);
   }
@@ -93,6 +100,8 @@ const traverseList = (node, ctx, core) => {
       return core.notEq(node, rest, ctx, traverser);
     case "require":
       return core.require_(node, rest, ctx, traverser);
+    case "import":
+      return core.import_(node, rest, ctx, traverser);
     default:
       return core.fnCall(node, rest, ctx, traverser);
   }

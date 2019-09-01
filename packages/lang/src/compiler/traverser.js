@@ -32,6 +32,7 @@ module.exports = (ir, config) => {
 const traverse = (node, config) => {
   switch (node.type) {
     case t.STRING:
+    case t.KEYWORD:
       return transformer.string(node, traverse);
     case t.DECLARE:
       return transformer.declare(node, traverse);
@@ -61,6 +62,8 @@ const traverse = (node, config) => {
       return transformer.fnCall(node, traverse);
     case t.REQUIRE:
       return transformer.require_(node, traverse, config);
+    case t.IMPORT:
+      return transformer.import_(node, traverse, config);
   }
 
   throw `could not traverse type ${node.type} at compiler`;

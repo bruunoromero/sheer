@@ -2,8 +2,8 @@ const path = require("path");
 
 const EXT = "cris";
 const OUT_EXT = "js";
-const CORE = "__$$CRIS_CORE$$__";
 const GLOBALS = "__$$GLOBALS$$__";
+const CORE = "__$$CRIS_LANG_CORE$$__";
 
 const rootFolder = ({ rootSource, outSource }, itOut) =>
   itOut ? outSource : rootSource;

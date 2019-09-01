@@ -42,8 +42,9 @@ module.exports.vector = value => {
   };
 };
 
-module.exports.fn = (params, body) => {
+module.exports.fn = (params, body, rest) => {
   return {
+    rest,
     body,
     params,
     type: t.FN
@@ -126,10 +127,11 @@ module.exports.declare = (value, init, isGlobal) => {
   };
 };
 
-module.exports.member = ([owner, member]) => {
+module.exports.member = ([owner, member], unnomralized) => {
   return {
     owner,
     member,
+    unnomralized,
     type: t.MEMBER
   };
 };
@@ -155,6 +157,14 @@ module.exports.require_ = (ns, as, refer) => {
     as,
     refer,
     type: t.REQUIRE
+  };
+};
+
+module.exports.import_ = (path, as) => {
+  return {
+    as,
+    path,
+    type: t.IMPORT
   };
 };
 

@@ -28,12 +28,13 @@ const fnCall = coreFunction(validator.ok, (meta, args, ctx, traverse) => {
 const fn = coreFunction(validator.fn, (meta, args, ctx, traverse) => {
   const fCtx = context(ctx);
   const params = traverse(args[0], fCtx);
+  const rest = params.value.some(el => el.value === "&");
 
   params.value.forEach(el => fCtx.addDefinition(el.value, false, el));
 
   const body = traverseArgs(args.slice(1), fCtx, traverse);
 
-  return transformer.fn(params.value, body);
+  return transformer.fn(params.value, body, rest);
 });
 
 const def = coreFunction(validator.def, (meta, args, ctx, traverse) => {
@@ -202,6 +203,20 @@ const require_ = coreFunction(
   }
 );
 
+const import_ = coreFunction(
+  validator.ok,
+  (meta, args, ctx, traverse, vldt) => {
+    const [ns, ...rest] = traverse(args[0], ctx).value;
+    const grouppedRest = utils.chunks(rest, 2);
+
+    const maybeAs = grouppedRest.filter(group => group[0].value === "as")[0];
+
+    const as = maybeAs ? maybeAs[1] : null;
+
+    return transformer.import_(ns, as);
+  }
+);
+
 const nativeFnCall = coreFunction(
   validator.ok,
   (meta, args, ctx, traverse, vldt) => {
@@ -213,6 +228,16 @@ const nativeFnCall = coreFunction(
       member,
       traverseArgs(args.slice(1), ctx, traverse)
     );
+  }
+);
+
+const keywordCall = coreFunction(
+  validator.ok,
+  (meta, args, ctx, traverse, vldt) => {
+    const callee = traverse(args[0], ctx);
+    const keyword = meta.value[0];
+
+    return transformer.member([callee.value, keyword.value], true);
   }
 );
 
@@ -233,7 +258,9 @@ module.exports = validator => {
     notEq: notEq(validator),
     defnp: defnp(validator),
     fnCall: fnCall(validator),
+    import_: import_(validator),
     require_: require_(validator),
+    keywordCall: keywordCall(validator),
     nativeFnCall: nativeFnCall(validator)
   };
 };

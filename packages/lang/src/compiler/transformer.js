@@ -2,6 +2,14 @@ const babel = require("@babel/types");
 
 const utils = require("../utils");
 
+const memberUtil = value => {
+  const normalizedMember = utils.normalizeName(value);
+  const isExpr = value !== normalizedMember;
+  const member = isExpr ? babel.stringLiteral(value) : babel.identifier(value);
+
+  return [isExpr, member];
+};
+
 const statement = node => {
   if (
     node.type.toLowerCase().indexOf("expression") > -1 ||
@@ -21,6 +29,17 @@ const returnLast = (curr, index, exprs) => {
   return curr;
 };
 
+const toRestIfNeeded = (node, params) => {
+  if (node.rest) {
+    const init = params.slice(0, -2);
+    const rest = babel.restElement(params.slice(-1)[0]);
+
+    return init.concat([rest]);
+  }
+
+  return params;
+};
+
 module.exports.number = node => {
   return babel.numericLiteral(node.value);
 };
@@ -30,13 +49,14 @@ module.exports.string = node => {
 };
 
 module.exports.declare = (node, traverse) => {
+  const [isExpr, member] = memberUtil(node.value);
   if (node.isGlobal) {
     return babel.assignmentExpression(
       "=",
       babel.memberExpression(
         babel.identifier(utils.normalizeName(utils.GLOBALS)),
-        babel.stringLiteral(utils.normalizeName(node.value)),
-        true
+        member,
+        isExpr
       ),
       traverse(node.init)
     );
@@ -47,21 +67,23 @@ module.exports.declare = (node, traverse) => {
 };
 
 module.exports.member = node => {
-  return babel.memberExpression(
-    babel.identifier(node.owner),
-    babel.stringLiteral(node.member),
-    true
-  );
+  const normalizedMember = utils.normalizeName(node.member);
+  const isExpr = node.member !== normalizedMember;
+  const member = isExpr
+    ? babel.stringLiteral(node.member)
+    : babel.identifier(node.member);
+  const callee = node.unnormalized
+    ? node.owner
+    : utils.normalizeName(node.owner);
+
+  return babel.memberExpression(babel.identifier(callee), member, isExpr);
 };
 
 module.exports.def = (node, traverse) => {
+  const [isExpr, member] = memberUtil(node.name);
   return babel.assignmentExpression(
     "=",
-    babel.memberExpression(
-      babel.identifier(utils.GLOBALS),
-      babel.stringLiteral(node.name),
-      true
-    ),
+    babel.memberExpression(babel.identifier(utils.GLOBALS), member, isExpr),
     traverse(node.value)
   );
 };
@@ -103,6 +125,8 @@ module.exports.not = (node, traverse) => {
 };
 
 module.exports.fn = (node, traverse) => {
+  const params = node.params.map(traverse);
+  const expandedParams = toRestIfNeeded(node, params);
   return babel.callExpression(
     babel.memberExpression(
       babel.identifier(utils.CORE),
@@ -111,7 +135,7 @@ module.exports.fn = (node, traverse) => {
     [
       babel.functionExpression(
         null,
-        node.params.map(traverse),
+        expandedParams,
         babel.blockStatement(
           node.body
             .map(traverse)
@@ -151,6 +175,17 @@ module.exports.require_ = (node, traverse, config) => {
   return babel.importDeclaration(
     [babel.importDefaultSpecifier(as || name)],
     babel.stringLiteral(filePath)
+  );
+};
+
+module.exports.import_ = (node, traverse, config) => {
+  return babel.importDeclaration(
+    [
+      babel.importDefaultSpecifier(
+        babel.identifier(utils.normalizeName(node.as.value))
+      )
+    ],
+    babel.stringLiteral(node.path.value)
   );
 };
 
