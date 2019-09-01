@@ -176,7 +176,7 @@ module.exports.require_ = (node, traverse, config) => {
   const filePath = utils.nameToPath(node.ns.value, config, true);
   const currentPath = utils.nameToPath(config.ns, config, true);
   const resolvedPath = path.relative(currentPath, filePath).slice(1);
-  
+
   if (!resolvedPath) return;
 
   const name = traverse(node.ns, config);

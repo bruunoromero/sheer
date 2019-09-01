@@ -1,0 +1,7 @@
+(ns yall.test)
+
+(defn describe [desc f]
+  (.describe global desc (discard f)))
+
+(defn it [desc f]
+  (.it global desc (discard f)))

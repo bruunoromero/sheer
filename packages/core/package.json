@@ -9,10 +9,6 @@
   "dependencies": {
     "@yall/lang": "^1.0.0"
   },
-  "jest": {
-    "testRegex": "./out/tests/.*.js$",
-    "rootDir": "."
-  },
   "devDependencies": {
     "jest": "^24.9.0"
   }

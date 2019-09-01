@@ -1,0 +1,7 @@
+(ns tests.yall.core
+  :require [[yall.test :refer [describe it]]])
+
+(describe "f" 
+  (fn []
+    (it "a"
+      (fn [] "a"))))

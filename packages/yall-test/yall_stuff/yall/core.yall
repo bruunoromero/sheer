@@ -1,0 +1,90 @@
+(ns yall.core
+  :import [["@yall/lang/core" :as lang.core]])
+
+;; Collections Operations
+
+(defn map [f coll]
+  (.map coll f))
+
+(defn filter [f coll] 
+  (.filter coll f))
+
+(defn reduce [f coll] 
+  (.reduce coll f))
+
+(defn reduce-init [f init coll]
+  (.reduce coll f init))
+
+(defn each [f coll]
+  (.forEach coll f))
+
+(defn join [d coll]
+  (.join coll d))
+
+;; Utils
+
+(def curry lang.core/curry)
+
+(defn -> [x & fns]
+  (reduce-init (fn [v f] (f v)) fns x))
+
+;; Strings
+
+(defn split [d s]
+  (.split s d))
+
+;; Interop
+
+(def r lang.core/r)
+(def type lang.core/type)
+(def raise lang.core/raise)
+(def try lang.core/tryCatch)
+(def log! (curry (:log console)))
+
+(defn new [c & args]
+  (lang.core/instaciate c args))
+
+(def discard lang.core/discard)
+
+
+;; Arithmetic Operations
+
+(def = lang.core/eq)
+(def / lang.core/div)
+(def + lang.core/add)
+(def - lang.core/sub)
+(def * lang.core/mul)
+(def not lang.core/not)
+(def not= lang.core/notEq)
+
+;; Assertions
+
+(defn is? [t v] 
+  (= t (type v)))
+
+(defn string? [v]
+  (is? "string" v))
+
+(def keyword? string?)
+
+(defn bool? [v]
+  (is? "boolean" v))
+
+(defn number? [v]
+  (is? "number" v))
+
+(defn NaN? [v]
+  (is? "NaN" v))  
+
+(defn instance? [c v]
+  (lang.core/isInstance c v))
+
+;; Cast
+
+(defn bool [v]
+  (not (not v)))
+
+(defn str [& vs]
+  (-> vs
+      (map (fn [v] (.toString v)))
+      (join "")))

@@ -1,0 +1,8 @@
+{
+  "name": "yall-test",
+  "src": "src",
+  "out": "out",
+  "main": "main",
+  "tests": "tests",
+  "version": "0.0.1"
+}

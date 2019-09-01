@@ -14,6 +14,7 @@ const DEFAULT_CONFIG = {
   src: "src",
   out: "out",
   main: "main",
+  tests: "tests",
   version: "0.0.1"
 };
 
@@ -36,6 +37,7 @@ const buildConfig = ({ filepath, config, isEmpty }) => {
     rootSource,
     projectRoot,
     rootModules,
+    tests: merdedConfig.tests,
     mainPath: mainPath(merdedConfig, { rootSource, projectRoot }),
     entryCompiled: mainPath(merdedConfig, { outSource, projectRoot }, true)
   };
