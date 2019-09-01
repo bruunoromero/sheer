@@ -1,5 +1,7 @@
+const colors = require("colors/safe");
+
 const errorMessage = fn => (...args) => {
-  return `\n${fn.apply(null, args)}\n`;
+  return `\n${colors.red(fn.apply(null, args))}\n`;
 };
 
 module.exports.invalidNumberOfArgs = errorMessage(

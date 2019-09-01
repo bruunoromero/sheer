@@ -1,3 +1,5 @@
+const rimraf = require("rimraf");
+
 const loader = require("./loader");
 const project = require("./project");
 
@@ -22,14 +24,14 @@ const compileToIr = (path, depGraph, config) => {
   }
 };
 
-const toIrFromNs = (ns, depGraph, config) => {
+const fromNsToIr = (ns, depGraph, config) => {
   const path = utils.nameToPath(ns, config);
   return compileToIr(path, depGraph, config);
 };
 
 const loadFromDeps = (deps, depGraph, config) => {
   const toLoadDeps = deps
-    .map(ns => toIrFromNs(ns, depGraph, config))
+    .map(ns => fromNsToIr(ns, depGraph, config))
     .map(f => f.deps())
     .flat()
     .filter((v, i, arr) => arr.indexOf(v) === i)
@@ -43,20 +45,28 @@ const loadFromDeps = (deps, depGraph, config) => {
 module.exports = () => {
   const config = project.loadConfig();
   const depGraph = dependency(config);
-  const entry = compileToIr(config.mainPath, depGraph, config);
 
-  loadFromDeps(entry.deps(), depGraph, config);
+  try {
+    const entry = compileToIr(config.mainPath, depGraph, config);
 
-  const files = depGraph
-    .files()
-    .map(([ns, file]) => [ns, compile(file, config)])
-    .forEach(([ns, file]) => {
-      const filePath = utils.nameToPath(ns, config, true);
-      loader.writeFile(filePath, file.compiled.code);
-    });
+    loadFromDeps(entry.deps(), depGraph, config);
+
+    rimraf.sync(config.outSource);
+
+    const files = depGraph
+      .files()
+      .map(([ns, file]) => [ns, compile(file, config)])
+      .forEach(([ns, file]) => {
+        const filePath = utils.nameToPath(ns, config, true);
+        loader.writeFile(filePath, file.compiled.code);
+      });
+  } catch (e) {
+    if (typeof e === "string") console.log(e);
+    process.exit();
+  }
 };
 
 module.exports.irToJs = compile;
 module.exports.dependency = dependency;
-module.exports.toIrFromNs = toIrFromNs;
+module.exports.fromNsToIr = fromNsToIr;
 module.exports.compileToIr = compileToIr;

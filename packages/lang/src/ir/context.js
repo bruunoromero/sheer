@@ -5,6 +5,7 @@ module.exports = parent => {
   const _defs = {};
   const _deps = [];
   const _exports = [];
+  const _imports = {};
   const _requires = {};
   const _parent = parent;
 
@@ -76,6 +77,13 @@ module.exports = parent => {
 
       return this.root().requires();
     },
+    imports() {
+      if (this.isRoot()) {
+        return _imports;
+      }
+
+      return this.root().imports();
+    },
     definitions(name) {
       if (name) {
         return _defs[name];
@@ -94,6 +102,15 @@ module.exports = parent => {
         _exports.push(name);
       }
     },
+    addImport(meta) {
+      if (this.isRoot()) {
+        const path = meta.path.value;
+
+        _imports[path] = meta;
+      } else {
+        this.root().addImport(name);
+      }
+    },
     addRequirement(meta) {
       if (this.isRoot()) {
         const ns = meta.ns.value;
@@ -107,7 +124,7 @@ module.exports = parent => {
 
         if (meta.refer) {
           meta.refer.value.map(el => {
-            _requires[el.value] = { ...meta, isRefer: true };
+            _requires[el.value] = { ...meta, isRefer: true, fromNs: false };
           });
         }
       } else {

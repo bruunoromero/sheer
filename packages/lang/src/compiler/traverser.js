@@ -40,6 +40,8 @@ const traverse = (node, config) => {
       return transformer.def(node, traverse);
     case t.NUMBER:
       return transformer.number(node, traverse);
+    case t.BOOL:
+      return transformer.bool(node, traverse);
     case t.IF:
       return transformer.if_(node, traverse);
     case t.SYMBOL:
@@ -50,8 +52,6 @@ const traverse = (node, config) => {
       return transformer.binOp(node, traverse);
     case t.LOG_OP:
       return transformer.logOp(node, traverse);
-    case t.NOT:
-      return transformer.not(node, traverse);
     case t.FN:
       return transformer.fn(node, traverse);
     case t.MEMBER:

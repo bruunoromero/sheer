@@ -44,6 +44,10 @@ module.exports.number = node => {
   return babel.numericLiteral(node.value);
 };
 
+module.exports.bool = node => {
+  return babel.booleanLiteral(node.value);
+};
+
 module.exports.string = node => {
   return babel.stringLiteral(node.value);
 };
@@ -168,7 +172,7 @@ module.exports.export = (node, traverse) => {
 };
 
 module.exports.require_ = (node, traverse, config) => {
-  const filePath = utils.nameToPath(node.ns.value, config);
+  const filePath = utils.nameToPath(node.ns.value, config, true);
   const name = traverse(node.ns, config);
   const as = node.as ? traverse(node.as, config) : null;
 

@@ -111,13 +111,6 @@ const binOp = (args, op, notJoining) => {
   };
 };
 
-module.exports.not = value => {
-  return {
-    value,
-    type: t.NOT
-  };
-};
-
 module.exports.declare = (value, init, isGlobal) => {
   return {
     init,
@@ -151,19 +144,21 @@ module.exports.list = () => {
   };
 };
 
-module.exports.require_ = (ns, as, refer) => {
+module.exports.require_ = (ns, as, refer, fromNs) => {
   return {
     ns,
     as,
     refer,
+    fromNs,
     type: t.REQUIRE
   };
 };
 
-module.exports.import_ = (path, as) => {
+module.exports.import_ = (path, as, fromNs) => {
   return {
     as,
     path,
+    fromNs,
     type: t.IMPORT
   };
 };

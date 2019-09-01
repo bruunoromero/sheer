@@ -90,7 +90,26 @@ const ns = coreFunction(validator.ns, (meta, args, ctx, traverse) => {
   const [sym, ...rest] = traverseArgs(args, ctx, traverse);
   const extra = utils.chunks(rest, 2);
 
-  console.log(extra);
+  const imports = extra.filter(el => el[0].value === "import")[0];
+  const requires = extra.filter(el => el[0].value === "require")[0];
+
+  if (imports) {
+    const importsVector = imports[1].value;
+    const importFn = import_(validator);
+
+    importsVector.forEach(imp => {
+      ctx.addImport(importFn({ ...meta, fromNs: true }, [imp], ctx, traverse));
+    });
+  }
+
+  if (requires) {
+    const requiresVector = requires[1].value;
+    const requireFn = require_(validator);
+
+    requiresVector.forEach(req => {
+      requireFn({ ...meta, fromNs: true }, [req], ctx, traverse);
+    });
+  }
 
   ctx.name(sym.value);
 });
@@ -133,54 +152,6 @@ const or = coreFunction(validator.ok, (meta, args, ctx, traverse) => {
   return transformer.logOp(_args, "||");
 });
 
-const add = coreFunction(validator.ok, (meta, args, ctx, traverse) => {
-  const _args = traverseArgs(args, ctx, traverse);
-
-  if (_args.length === 0) {
-    return transformer.true_;
-  }
-
-  if (_args.length === 1) {
-    return _args[0];
-  }
-
-  return transformer.binOp(_args, "+", true);
-});
-
-const eq = coreFunction(validator.ok, (meta, args, ctx, traverse) => {
-  const _args = traverseArgs(args, ctx, traverse);
-
-  if (_args.length === 0) {
-    return transformer.true_;
-  }
-
-  if (_args.length === 1) {
-    return _args[0];
-  }
-
-  return transformer.binOp(_args, "===");
-});
-
-const notEq = coreFunction(validator.ok, (meta, args, ctx, traverse) => {
-  const _args = traverseArgs(args, ctx, traverse);
-
-  if (_args.length === 0) {
-    return transformer.false_;
-  }
-
-  if (_args.length === 1) {
-    return _args[0];
-  }
-
-  return transformer.binOp(_args, "!==");
-});
-
-const not = coreFunction(validator.not, (meta, args, ctx, traverse) => {
-  const _args = traverseArgs(args, ctx, traverse);
-
-  return transformer.not(_args[0]);
-});
-
 const require_ = coreFunction(
   validator.require_,
   (meta, args, ctx, traverse, vldt) => {
@@ -195,7 +166,7 @@ const require_ = coreFunction(
     const as = maybeAs ? maybeAs[1] : null;
     const refer = maybeRefer ? maybeRefer[1] : null;
 
-    const transformed = transformer.require_(ns, as, refer);
+    const transformed = transformer.require_(ns, as, refer, meta.fromNs);
 
     ctx.addRequirement(transformed);
 
@@ -204,7 +175,7 @@ const require_ = coreFunction(
 );
 
 const import_ = coreFunction(
-  validator.ok,
+  validator.import_,
   (meta, args, ctx, traverse, vldt) => {
     const [ns, ...rest] = traverse(args[0], ctx).value;
     const grouppedRest = utils.chunks(rest, 2);
@@ -213,7 +184,7 @@ const import_ = coreFunction(
 
     const as = maybeAs ? maybeAs[1] : null;
 
-    return transformer.import_(ns, as);
+    return transformer.import_(ns, as, meta.fromNs);
   }
 );
 
@@ -246,16 +217,12 @@ module.exports = validator => {
     ns: ns(validator),
     fn: fn(validator),
     or: or(validator),
-    eq: eq(validator),
-    add: add(validator),
     if_: if_(validator),
     def: def(validator),
     and: and(validator),
-    not: not(validator),
     defn: defn(validator),
     defp: defp(validator),
     when: when(validator),
-    notEq: notEq(validator),
     defnp: defnp(validator),
     fnCall: fnCall(validator),
     import_: import_(validator),

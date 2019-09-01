@@ -17,6 +17,10 @@ module.exports = P.createLanguage({
     );
   },
 
+  NotNewline: () => P.regexp(/[^\n]*/),
+  _: r => r.Comment.sepBy(P.whitespace).trim(P.optWhitespace),
+  Comment: r => r.NotNewline.wrap(P.string(";"), P.string("\n")),
+
   Symbol: () => {
     return P.regexp(
       /[a-zA-Z_\-\+=\.></\\\?\*\|$&!][a-zA-Z_\-\+=\.></\\\?\*\|$&!0-9]*/
@@ -59,7 +63,7 @@ module.exports = P.createLanguage({
       .map(t.boolLiteral),
 
   List: r => {
-    return r.Expression.trim(P.optWhitespace)
+    return r.Expression.trim(r._)
       .many()
       .wrap(P.string("("), P.string(")"))
       .mark()
@@ -67,7 +71,7 @@ module.exports = P.createLanguage({
   },
 
   Vector: r => {
-    return r.Expression.trim(P.optWhitespace)
+    return r.Expression.trim(r._)
       .many()
       .wrap(P.string("["), P.string("]"))
       .mark()
@@ -75,7 +79,7 @@ module.exports = P.createLanguage({
   },
 
   Map: r => {
-    return r.Expression.trim(P.optWhitespace)
+    return r.Expression.trim(r._)
       .many()
       .wrap(P.string("{"), P.string("}"))
       .mark()
@@ -83,7 +87,7 @@ module.exports = P.createLanguage({
   },
 
   Set: r => {
-    return r.Expression.trim(P.optWhitespace)
+    return r.Expression.trim(r._)
       .many()
       .wrap(P.string("#{"), P.string("}"))
       .mark()
@@ -91,6 +95,6 @@ module.exports = P.createLanguage({
   },
 
   File: function(r) {
-    return r.Expression.trim(P.optWhitespace).many();
+    return r.Expression.trim(r._).many();
   }
 });

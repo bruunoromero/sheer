@@ -47,6 +47,14 @@ const generateDefinitions = ctx => {
     .map(el => transformer.declare(el, transformer.null_, true));
 };
 
+const generateImports = ctx => {
+  return Object.values(ctx.imports()).filter(el => el.fromNs);
+};
+
+const generateRequires = ctx => {
+  return Object.values(ctx.requires()).filter(el => el.fromNs);
+};
+
 const traverseVector = ({ value }, ctx, core) => {
   const mValue = value.map(el => traverse(el, ctx, core));
 
@@ -70,8 +78,6 @@ const traverseList = (node, ctx, core) => {
   }
 
   switch (firstEl.value) {
-    case "+":
-      return core.add(node, rest, ctx, traverser);
     case "ns":
       return core.ns(node, rest, ctx, traverser);
     case "fn":
@@ -92,12 +98,6 @@ const traverseList = (node, ctx, core) => {
       return core.and(node, rest, ctx, traverser);
     case "or":
       return core.or(node, rest, ctx, traverser);
-    case "=":
-      return core.eq(node, rest, ctx, traverser);
-    case "not":
-      return core.not(node, rest, ctx, traverser);
-    case "not=":
-      return core.notEq(node, rest, ctx, traverser);
     case "require":
       return core.require_(node, rest, ctx, traverser);
     case "import":
@@ -118,7 +118,10 @@ module.exports = (ast, vldt, core, ctx) => {
     throw errors;
   }
 
-  return generateDefinitions(ctx).concat(res);
+  return generateImports(ctx)
+    .concat(generateRequires(ctx))
+    .concat(generateDefinitions(ctx))
+    .concat(res);
 };
 
 module.exports.traverse = traverse;

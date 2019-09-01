@@ -1,6 +1,7 @@
 {
-  "name": "core",
-  "src": "src",
   "out": "out",
-  "version": "0.0.1"
+  "src": "src",
+  "name": "core",
+  "version": "0.0.1",
+  "main": "cris.core"
 }

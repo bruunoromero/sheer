@@ -5,13 +5,15 @@ const cosmiconfig = require("cosmiconfig");
 
 const utils = require("./utils");
 
-const ENTRY_NAME = `main.${utils.EXT}`;
+const entryName = entry => `${entry}.${utils.EXT}`;
+const ENTRY_NAME = entryName("main");
 
 let _config;
 
 const DEFAULT_CONFIG = {
   src: "src",
   out: "out",
+  main: "main",
   version: "0.0.1"
 };
 
@@ -21,16 +23,18 @@ const searchConfig = () => {
 
 const buildConfig = ({ filepath, config, isEmpty }) => {
   const rcConfig = isEmpty ? {} : config;
-  const merdedConfig = R.mergeDeepLeft(config, DEFAULT_CONFIG);
-  const rootSource = path.join(path.dirname(filepath), merdedConfig.src);
-  const outSource = path.join(path.dirname(filepath), merdedConfig.out);
-  const entryCompiled = `${outSource}${path.sep}main.${utils.OUT_EXT}`;
-  
+
+  const projectRoot = path.dirname(filepath);
+  const merdedConfig = R.mergeDeepLeft(rcConfig, DEFAULT_CONFIG);
+
+  const outSource = path.join(projectRoot, merdedConfig.out);
+  const rootSource = path.join(projectRoot, merdedConfig.src);
+
   return {
     outSource,
     rootSource,
-    entryCompiled,
-    mainPath: mainPath(rootSource)
+    mainPath: mainPath(merdedConfig, { rootSource }),
+    entryCompiled: mainPath(merdedConfig, { outSource }, true)
   };
 };
 
@@ -47,8 +51,8 @@ const loadConfig = () => {
   return _config;
 };
 
-const mainPath = rootSource => {
-  return path.join(rootSource, ENTRY_NAME);
+const mainPath = ({ main }, config, isOut) => {
+  return utils.nameToPath(main, config, isOut);
 };
 
 const config = () => {
