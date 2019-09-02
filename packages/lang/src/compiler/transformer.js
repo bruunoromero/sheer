@@ -3,14 +3,6 @@ const babel = require("@babel/types");
 
 const utils = require("../utils");
 
-const memberUtil = value => {
-  const normalizedMember = utils.normalizeName(value);
-  const isExpr = value !== normalizedMember;
-  const member = isExpr ? babel.stringLiteral(value) : babel.identifier(value);
-
-  return [isExpr, member];
-};
-
 const statement = node => {
   if (
     node.type.toLowerCase().indexOf("expression") > -1 ||
@@ -54,14 +46,13 @@ module.exports.string = node => {
 };
 
 module.exports.declare = (node, traverse) => {
-  const [isExpr, member] = memberUtil(node.value);
   if (node.isGlobal) {
     return babel.assignmentExpression(
       "=",
       babel.memberExpression(
         babel.identifier(utils.normalizeName(utils.GLOBALS)),
-        member,
-        isExpr
+        babel.stringLiteral(node.value),
+        true
       ),
       traverse(node.init)
     );
@@ -71,24 +62,21 @@ module.exports.declare = (node, traverse) => {
   return null;
 };
 
-module.exports.member = node => {
-  const normalizedMember = utils.normalizeName(node.member);
-  const isExpr = node.member !== normalizedMember;
-  const member = isExpr
-    ? babel.stringLiteral(node.member)
-    : babel.identifier(node.member);
-  const callee = node.unnormalized
-    ? node.owner
-    : utils.normalizeName(node.owner);
+module.exports.member = (node, traverse) => {
+  let member = traverse(node.member);
+  const callee = traverse(node.owner);
 
-  return babel.memberExpression(babel.identifier(callee), member, isExpr);
+  return babel.memberExpression(callee, member, member.type !== "Identifier");
 };
 
 module.exports.def = (node, traverse) => {
-  const [isExpr, member] = memberUtil(node.name);
   return babel.assignmentExpression(
     "=",
-    babel.memberExpression(babel.identifier(utils.GLOBALS), member, isExpr),
+    babel.memberExpression(
+      babel.identifier(utils.GLOBALS),
+      babel.stringLiteral(node.name),
+      true
+    ),
     traverse(node.value)
   );
 };
@@ -173,8 +161,8 @@ module.exports.export = (node, traverse) => {
 };
 
 module.exports.require_ = (node, traverse, config) => {
-  const filePath = utils.nameToPath(node.ns.value, config, true);
   const currentPath = utils.nameToPath(config.ns, config, true);
+  const filePath = utils.nameToPath(node.ns.value, config, true);
   const resolvedPath = path.relative(currentPath, filePath).slice(1);
 
   if (!resolvedPath) return;

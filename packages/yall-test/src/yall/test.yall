@@ -5,3 +5,10 @@
 
 (defn it [desc f]
   (.it global desc (discard f)))
+
+(defn expect [v]
+  (.expect global v))
+
+(defn same [v exp]
+  (.toBe (.expect global v) exp))
+

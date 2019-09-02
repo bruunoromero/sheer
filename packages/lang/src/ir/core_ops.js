@@ -193,8 +193,10 @@ const nativeFnCall = coreFunction(
   (meta, args, ctx, traverse, vldt) => {
     const fnCall = meta.value[0];
     const callee = traverse(args[0], ctx);
-    const member = transformer.member([callee.value, fnCall.value.slice(1)]);
-
+    const member = transformer.member([
+      callee,
+      { ...fnCall, value: fnCall.value.slice(1) }
+    ]);
     return transformer.fnCall(
       member,
       traverseArgs(args.slice(1), ctx, traverse)
@@ -208,7 +210,7 @@ const keywordCall = coreFunction(
     const callee = traverse(args[0], ctx);
     const keyword = meta.value[0];
 
-    return transformer.member([callee.value, keyword.value], true);
+    return transformer.member([callee, keyword], true);
   }
 );
 

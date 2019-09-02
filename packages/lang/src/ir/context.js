@@ -1,4 +1,5 @@
 const utils = require("../utils");
+const transformer = require("./transformer");
 
 module.exports = parent => {
   let _name = null;
@@ -44,19 +45,25 @@ module.exports = parent => {
       const required = requires[name];
 
       if (member) {
-        return [owner, member];
+        return [
+          transformer.symbol({ value: owner }),
+          transformer.string(member)
+        ];
       }
 
       if (!_defs[name] && _parent) {
         return _parent.resolve(name);
       } else if (_defs[name] && !_parent) {
-        return [utils.GLOBALS, name];
+        return [
+          transformer.symbol({ value: utils.GLOBALS }),
+          transformer.string(name)
+        ];
       } else if (required) {
         if (required.isRefer) {
           if (required.as) {
-            return [required.as.value, name];
+            return [required.as, transformer.string(name)];
           } else {
-            return [required.ns.value, name];
+            return [required.ns, transformer.string(name)];
           }
         }
       }

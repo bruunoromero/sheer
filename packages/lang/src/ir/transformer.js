@@ -35,6 +35,13 @@ module.exports.primitive = ({ value, type }) => {
   };
 };
 
+module.exports.string = value => {
+  return {
+    value,
+    type: t.STRING
+  };
+};
+
 module.exports.vector = value => {
   return {
     value,
@@ -64,8 +71,8 @@ module.exports.when = (cond, truthy) => {
 };
 
 module.exports.def = (sym, expr) => {
-  const name = sym.value || sym.member;
-  
+  const name = sym.value || sym.member.value;
+
   return {
     name,
     value: expr,
