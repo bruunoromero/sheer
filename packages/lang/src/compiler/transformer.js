@@ -63,7 +63,7 @@ module.exports.declare = (node, traverse) => {
 };
 
 module.exports.member = (node, traverse) => {
-  let member = traverse(node.member);
+  const member = traverse(node.member);
   const callee = traverse(node.owner);
 
   return babel.memberExpression(callee, member, !babel.isIdentifier(member));

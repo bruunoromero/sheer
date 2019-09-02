@@ -191,11 +191,15 @@ const import_ = coreFunction(
 const nativeFnCall = coreFunction(
   validator.ok,
   (meta, args, ctx, traverse, vldt) => {
-    const fnCall = meta.value[0];
     const callee = traverse(args[0], ctx);
+    const fnCall = meta.value[0].value.slice(1);
+    const normalizedCallName = utils.normalizeName(fnCall);
+
     const member = transformer.member([
       callee,
-      { ...fnCall, value: fnCall.value.slice(1) }
+      fnCall === normalizedCallName
+        ? transformer.symbol({ value: fnCall })
+        : transformer.string(fnCall)
     ]);
     return transformer.fnCall(
       member,

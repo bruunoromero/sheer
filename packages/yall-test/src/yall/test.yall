@@ -9,6 +9,6 @@
 (defn expect [v]
   (.expect global v))
 
-(defn same [v exp]
+(defn same? [v exp]
   (.toBe (.expect global v) exp))
 
