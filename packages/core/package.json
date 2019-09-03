@@ -1,13 +1,13 @@
 {
-  "name": "@yall/core",
+  "name": "@sheer/core",
   "version": "1.0.0",
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "test": "yall c && jest"
+    "test": "sheer c && jest"
   },
   "dependencies": {
-    "@yall/lang": "^1.0.0"
+    "@sheer/lang": "^1.0.0"
   },
   "devDependencies": {
     "jest": "^24.9.0"

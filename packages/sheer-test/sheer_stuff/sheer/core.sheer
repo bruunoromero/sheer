@@ -1,5 +1,5 @@
-(ns yall.core
-  :import [["@yall/lang/core" :as lang.core]])
+(ns sheer.core
+  :import [["@sheer/lang/core" :as lang.core]])
 
 ;; Collections Operations
 
@@ -39,6 +39,7 @@
 (def type lang.core/type)
 (def raise lang.core/raise)
 (def try lang.core/tryCatch)
+
 (def log! (curry (:log console)))
 
 (defn new [c & args]

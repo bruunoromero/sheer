@@ -1,5 +1,5 @@
 {
-  "name": "@yall/cli",
+  "name": "@sheer/cli",
   "version": "1.0.0",
   "main": "src/index.js",
   "license": "MIT",
@@ -7,8 +7,8 @@
     "dev": "node src/index.js"
   },
   "dependencies": {
-    "@yall/core": "^1.0.0",
-    "@yall/lang": "^1.0.0",
+    "@sheer/core": "^1.0.0",
+    "@sheer/lang": "^1.0.0",
     "babel-plugin-add-module-exports": "^1.0.2",
     "camelcase": "^5.3.1",
     "commander": "^3.0.1",
@@ -16,6 +16,6 @@
     "jest-cli": "^24.9.0"
   },
   "bin": {
-    "yall": "./src/index.js"
+    "sheer": "./src/index.js"
   }
 }

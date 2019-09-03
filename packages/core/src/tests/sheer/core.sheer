@@ -1,4 +1,4 @@
-(ns tests.yall.core)
+(ns tests.sheer.core)
 
 (describe "" 
   (fn []

@@ -1,6 +1,6 @@
-const compiler = require("@yall/lang");
+const compiler = require("@sheer/lang");
 const { fork } = require("child_process");
-const project = require("@yall/lang/src/project");
+const project = require("@sheer/lang/src/project");
 
 module.exports = () => {
   compiler();

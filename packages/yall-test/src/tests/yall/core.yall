@@ -1,8 +1,0 @@
-(ns tests.yall.core
-  :require [[yall.test :refer [describe it same?]]])
-
-(describe "f" 
-  (fn []
-    (it "a"
-      (fn [] 
-        (same? 10 10)))))

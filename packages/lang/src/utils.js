@@ -1,10 +1,10 @@
 const fs = require("fs");
 const path = require("path");
 
-const EXT = "yall";
+const EXT = "sheer";
 const OUT_EXT = "js";
 const GLOBALS = "__$$GLOBALS$$__";
-const CORE = "__$$YALL_LANG_CORE$$__";
+const CORE = "__$$SHEER_LANG_CORE$$__";
 
 const MODULES_FOLDER = `${EXT}_stuff`;
 

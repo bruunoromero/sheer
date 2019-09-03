@@ -1,4 +1,4 @@
-(ns yall.test)
+(ns sheer.test)
 
 (defn describe [desc f]
   (.describe global desc (discard f)))
