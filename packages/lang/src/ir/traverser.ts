@@ -3,7 +3,7 @@ const R = require("ramda");
 const resolve = require("./resolver");
 const transformer = require("./transformer");
 
-const pt = require("../parser/types");
+import { ParserType } from "./../parser/types";
 
 const resolveSymbols = fn => (node, ctx, core) => {
   const traversed = fn(node, ctx, core);
@@ -24,17 +24,17 @@ const traverseWithCore = (traverse, core) => {
 
 const traverse = resolveSymbols((node, ctx, core) => {
   switch (node.type) {
-    case pt.NULL:
-    case pt.BOOL:
-    case pt.STRING:
-    case pt.NUMBER:
-    case pt.KEYWORD:
+    case ParserType.NULL:
+    case ParserType.BOOL:
+    case ParserType.STRING:
+    case ParserType.NUMBER:
+    case ParserType.KEYWORD:
       return transformer.primitive(node);
-    case pt.SYMBOL:
+    case ParserType.SYMBOL:
       return transformer.symbol(node);
-    case pt.LIST:
+    case ParserType.LIST:
       return traverseList(node, ctx, core);
-    case pt.VECTOR:
+    case ParserType.VECTOR:
       return traverseVector(node, ctx, core);
   }
 
@@ -48,11 +48,11 @@ const generateDefinitions = ctx => {
 };
 
 const generateImports = ctx => {
-  return Object.values(ctx.imports()).filter(el => el.fromNs);
+  return Object.values(ctx.imports()).filter((el: any) => el.fromNs);
 };
 
 const generateRequires = ctx => {
-  return Object.values(ctx.requires()).filter(el => el.fromNs);
+  return Object.values(ctx.requires()).filter((el: any) => el.fromNs);
 };
 
 const traverseVector = ({ value }, ctx, core) => {
@@ -69,7 +69,7 @@ const traverseList = (node, ctx, core) => {
 
   const traverser = traverseWithCore(traverse, core);
 
-  if (firstEl.type === pt.KEYWORD) {
+  if (firstEl.type === ParserType.KEYWORD) {
     return core.keywordCall(node, rest, ctx, traverser);
   }
 
@@ -109,7 +109,7 @@ const traverseList = (node, ctx, core) => {
   throw new Error(`could not traverse type ${node.type}`);
 };
 
-module.exports = (ast, vldt, core, ctx) => {
+export default (ast, vldt, core, ctx) => {
   const res = ast.map(node => traverse(node, ctx, core)).filter(e => e);
 
   const errors = vldt.errors();

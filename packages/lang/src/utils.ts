@@ -1,31 +1,34 @@
-const fs = require("fs");
-const path = require("path");
+import { SheerConfig } from "./project";
+import * as fs from "fs";
+import * as path from "path";
 
-const EXT = "sheer";
-const OUT_EXT = "js";
-const GLOBALS = "__$$GLOBALS$$__";
-const CORE = "__$$SHEER_LANG_CORE$$__";
+export const EXT = "sheer";
+export const OUT_EXT = "js";
+export const GLOBALS = "__$$GLOBALS$$__";
+export const CORE = "__$$SHEER_LANG_CORE$$__";
 
-const MODULES_FOLDER = `${EXT}_stuff`;
+export const MODULES_FOLDER = `${EXT}_stuff`;
 
 const fsName = name => name.split(".").join(path.sep);
 
-const sourceFolder = ({ rootSource, outSource }, itOut) =>
-  itOut ? outSource : rootSource;
+const sourceFolder = (
+  { rootSource, outSource }: SheerConfig,
+  itOut?: boolean
+): string => (itOut ? outSource : rootSource);
 
 const ext = isOut => (isOut ? OUT_EXT : EXT);
 
-const addExt = (filePath, isOut) => {
+const addExt = (filePath: string, isOut?: boolean) => {
   return `${filePath}.${ext(isOut)}`;
 };
 
-const pathNoExt = filePath => {
+export const pathNoExt = (filePath: string): string => {
   const ext = path.extname(filePath);
 
   return filePath.slice(0, -ext.length);
 };
 
-module.exports.chunks = (array, chunkSize) => {
+export const chunks = <T>(array: T[], chunkSize: number): T[][] => {
   const res = [];
 
   for (let i = 0; i < array.length; i += chunkSize) {
@@ -35,7 +38,11 @@ module.exports.chunks = (array, chunkSize) => {
   return res;
 };
 
-module.exports.pathToName = (filePath, config, isOut) => {
+export const pathToName = (
+  filePath: string,
+  config: SheerConfig,
+  isOut?: boolean
+): string => {
   const nonExt = pathNoExt(filePath);
 
   return nonExt
@@ -44,7 +51,11 @@ module.exports.pathToName = (filePath, config, isOut) => {
     .join(".");
 };
 
-module.exports.nameToPath = (name, config, isOut) => {
+export const nameToPath = (
+  name: string,
+  config: SheerConfig,
+  isOut?: boolean
+): string => {
   if (!isOut && config.projectRoot) {
     const modules = path.resolve(
       config.projectRoot,
@@ -62,7 +73,7 @@ module.exports.nameToPath = (name, config, isOut) => {
   return addExt(fileName, isOut);
 };
 
-module.exports.normalizeName = name => {
+export const normalizeName = (name: string): string => {
   return name
     .replace(/-/g, "_")
     .replace(/>/g, "_GT_")
@@ -78,7 +89,7 @@ module.exports.normalizeName = name => {
     .replace(/\\/g, "_BSLASH_");
 };
 
-module.exports.unnormalizeName = name => {
+export const unnormalizeName = (name: string): string => {
   return name
     .replace(/_GT_/g, ">")
     .replace(/_LT_/g, "<")
@@ -93,11 +104,3 @@ module.exports.unnormalizeName = name => {
     .replace(/_BSLASH_/g, "\\")
     .replace(/_/g, "-");
 };
-
-module.exports.EXT = EXT;
-module.exports.CORE = CORE;
-module.exports.OUT_EXT = OUT_EXT;
-module.exports.GLOBALS = GLOBALS;
-module.exports.MODULES_FOLDER = MODULES_FOLDER;
-
-module.exports.pathNoExt = pathNoExt;

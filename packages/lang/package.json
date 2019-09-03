@@ -1,11 +1,12 @@
 {
   "name": "@sheer/lang",
   "version": "1.0.0",
-  "main": "src/index.js",
+  "main": "dist/src/index.js",
   "license": "MIT",
   "scripts": {
+    "build": "tsc",
     "dev:f": "node fugger/index.js",
-    "dev": "node src/index.js",
+    "dev": "ts-node src/index.ts",
     "test": "jest --coverage",
     "lint": "eslint src/** test/**"
   },
@@ -24,10 +25,15 @@
     "rimraf": "^3.0.0"
   },
   "devDependencies": {
+    "@types/node": "^12.7.3",
+    "@types/parsimmon": "^1.10.0",
+    "@types/ramda": "^0.26.21",
     "eslint": "^6.2.1",
     "eslint-config-prettier": "^6.1.0",
     "jest": "^24.8.0",
     "proxy-polyfill": "^0.3.0",
-    "randexp": "^0.5.3"
+    "randexp": "^0.5.3",
+    "ts-node": "^8.3.0",
+    "typescript": "^3.6.2"
   }
 }

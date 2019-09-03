@@ -3,7 +3,7 @@ const codeFrame = require("@babel/code-frame");
 const utils = require("../utils");
 const errors = require("./errors");
 const colors = require("colors/safe");
-const pt = require("../parser/types");
+import { ParserType } from "../parser/types";
 
 const invalidTypeProvided = (validator, fnName, arg, type) => {
   if (arg.type !== type) {
@@ -32,8 +32,8 @@ const accumulatingErrors = (...fns) => {
     .some(el => el === false);
 };
 
-module.exports = (filename, source) => {
-  _errors = [];
+export default (filename, source) => {
+  const _errors = [];
 
   return {
     addError(loc, message) {
@@ -60,7 +60,7 @@ ${err}
 
 // STATEMENTS
 
-module.exports.ns = (validator, meta, args) => {
+export const ns = (validator, meta, args) => {
   const EXPECTED_NUM_OF_ARGS = 1;
   if (args.length < EXPECTED_NUM_OF_ARGS) {
     validator.addError(
@@ -70,7 +70,7 @@ module.exports.ns = (validator, meta, args) => {
   }
 };
 
-module.exports.require_ = (validator, meta, args) => {
+export const require_ = (validator, meta, args) => {
   const EXPECTED_NUM_OF_ARGS = 1;
   const VECTOR_MIN_NUMBER_OF_ELEMENTS = 1;
 
@@ -90,7 +90,9 @@ module.exports.require_ = (validator, meta, args) => {
       }
     },
     () => {
-      if (!invalidTypeProvided(validator, "require", args[0], pt.VECTOR))
+      if (
+        !invalidTypeProvided(validator, "require", args[0], ParserType.VECTOR)
+      )
         return false;
     },
     () => {
@@ -116,23 +118,35 @@ module.exports.require_ = (validator, meta, args) => {
       //TODO: Do something when as or refer has only one element
 
       return forceEval(
-        invalidTypeProvided(validator, "require", ns, pt.SYMBOL),
+        invalidTypeProvided(validator, "require", ns, ParserType.SYMBOL),
         as
-          ? invalidTypeProvided(validator, "require", as[0], pt.KEYWORD)
+          ? invalidTypeProvided(validator, "require", as[0], ParserType.KEYWORD)
           : true,
-        as ? invalidTypeProvided(validator, "require", as[1], pt.SYMBOL) : true,
-        refer
-          ? invalidTypeProvided(validator, "require", refer[0], pt.KEYWORD)
+        as
+          ? invalidTypeProvided(validator, "require", as[1], ParserType.SYMBOL)
           : true,
         refer
-          ? invalidTypeProvided(validator, "require", refer[1], pt.VECTOR)
+          ? invalidTypeProvided(
+              validator,
+              "require",
+              refer[0],
+              ParserType.KEYWORD
+            )
+          : true,
+        refer
+          ? invalidTypeProvided(
+              validator,
+              "require",
+              refer[1],
+              ParserType.VECTOR
+            )
           : true
       );
     }
   );
 };
 
-module.exports.import_ = (validator, meta, args) => {
+export const import_ = (validator, meta, args) => {
   const EXPECTED_NUM_OF_ARGS = 1;
   const VECTOR_NUMBER_OF_ELEMENTS = 3;
 
@@ -152,7 +166,7 @@ module.exports.import_ = (validator, meta, args) => {
       }
     },
     () => {
-      if (!invalidTypeProvided(validator, "import", args[0], pt.VECTOR))
+      if (!invalidTypeProvided(validator, "import", args[0], ParserType.VECTOR))
         return false;
     },
     () => {
@@ -175,9 +189,9 @@ module.exports.import_ = (validator, meta, args) => {
       const imp = args[0].value;
 
       return forceEval(
-        invalidTypeProvided(validator, "import", imp[0], pt.STRING),
-        invalidTypeProvided(validator, "import", imp[1], pt.KEYWORD),
-        invalidTypeProvided(validator, "import", imp[2], pt.SYMBOL)
+        invalidTypeProvided(validator, "import", imp[0], ParserType.STRING),
+        invalidTypeProvided(validator, "import", imp[1], ParserType.KEYWORD),
+        invalidTypeProvided(validator, "import", imp[2], ParserType.SYMBOL)
       );
     }
   );
@@ -185,7 +199,7 @@ module.exports.import_ = (validator, meta, args) => {
 
 // DEFINITIONS
 
-module.exports.def = (validator, meta, args) => {
+export const def = (validator, meta, args) => {
   const EXPECTED_NUM_OF_ARGS = 2;
 
   if (args.length !== EXPECTED_NUM_OF_ARGS) {
@@ -197,10 +211,10 @@ module.exports.def = (validator, meta, args) => {
     return false;
   }
 
-  return invalidTypeProvided(validator, "def", args[0], pt.SYMBOL);
+  return invalidTypeProvided(validator, "def", args[0], ParserType.SYMBOL);
 };
 
-module.exports.defn = (validator, meta, args) => {
+export const defn = (validator, meta, args) => {
   const EXPECTED_NUM_OF_ARGS = 3;
 
   if (args.length < EXPECTED_NUM_OF_ARGS) {
@@ -213,14 +227,14 @@ module.exports.defn = (validator, meta, args) => {
   }
 
   return forceEval(
-    invalidTypeProvided(validator, "defn", args[0], pt.SYMBOL),
-    invalidTypeProvided(validator, "defn", args[1], pt.VECTOR)
+    invalidTypeProvided(validator, "defn", args[0], ParserType.SYMBOL),
+    invalidTypeProvided(validator, "defn", args[1], ParserType.VECTOR)
   );
 };
 
 // EXPRESSIONS
 
-module.exports.fn = (validator, meta, args) => {
+export const fn = (validator, meta, args) => {
   const MAX_NUM_OF_ARGS = 2;
   if (args.length < MAX_NUM_OF_ARGS) {
     validator.addError(
@@ -231,10 +245,10 @@ module.exports.fn = (validator, meta, args) => {
     return false;
   }
 
-  return invalidTypeProvided(validator, "fn", args[0], pt.VECTOR);
+  return invalidTypeProvided(validator, "fn", args[0], ParserType.VECTOR);
 };
 
-module.exports.if_ = (validator, meta, args) => {
+export const if_ = (validator, meta, args) => {
   const EXPECTED_NUM_OF_ARGS = 3;
   if (args.length !== EXPECTED_NUM_OF_ARGS) {
     validator.addError(
@@ -248,7 +262,7 @@ module.exports.if_ = (validator, meta, args) => {
   return true;
 };
 
-module.exports.when = (validator, meta, args) => {
+export const when = (validator, meta, args) => {
   const EXPECTED_NUM_OF_ARGS = 2;
   if (args.length !== EXPECTED_NUM_OF_ARGS) {
     validator.addError(
@@ -262,7 +276,7 @@ module.exports.when = (validator, meta, args) => {
   return true;
 };
 
-module.exports.not = (validator, meta, args) => {
+export const not = (validator, meta, args) => {
   const EXPECTED_NUM_OF_ARGS = 1;
   if (args.length !== EXPECTED_NUM_OF_ARGS) {
     validator.addError(
@@ -276,7 +290,7 @@ module.exports.not = (validator, meta, args) => {
   return true;
 };
 
-module.exports.notEq = (validator, meta, args) => {
+export const notEq = (validator, meta, args) => {
   const EXPECTED_NUM_OF_ARGS = 1;
 
   if (args.length < EXPECTED_NUM_OF_ARGS) {
@@ -291,4 +305,4 @@ module.exports.notEq = (validator, meta, args) => {
   return true;
 };
 
-module.exports.ok = () => true;
+export const ok = () => true;

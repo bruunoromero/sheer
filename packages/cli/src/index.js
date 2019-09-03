@@ -10,7 +10,7 @@ const create = require("./create")
 program
   .command("compile")
   .alias("c")
-  .action(compiler)
+  .action(compiler.compile)
 
 program
   .command("run")

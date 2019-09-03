@@ -1,9 +1,9 @@
-const R = require("ramda");
+import * as R from "ramda";
 
-const context = require("./context");
-const coreOps = require("./core_ops");
-const traverse = require("./traverser");
-const validator = require("./validator");
+import traverse from "./traverser";
+import validator from "./validator";
+import * as context from "./context";
+import * as coreOps from "./core_ops";
 
 const file = (ctx, path, source, program) => {
   const _name = ctx.name();
@@ -36,7 +36,7 @@ const file = (ctx, path, source, program) => {
   };
 };
 
-module.exports = (filename, source, ast) => {
+export default (filename, source, ast) => {
   const ctx = context();
   const vldt = validator(filename, source);
   const core = coreOps(vldt);

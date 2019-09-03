@@ -1,19 +1,23 @@
-const fs = require("fs");
-const path = require("path");
-const rimraf = require("rimraf");
+import * as fs from "fs";
+import * as path from "path";
+import * as rimraf from "rimraf";
 
-const loader = require("./loader");
-const project = require("./project");
+import * as loader from "./loader";
+import { loadConfig, SheerConfig } from "./project";
 
-const ir = require("./ir");
-const utils = require("./utils");
-const parse = require("./parser");
+import ir from "./ir";
+import * as utils from "./utils";
+import { parse } from "./parser";
 
-const compile = require("./compiler");
+import * as compiler from "./compiler";
 
-const dependency = require("./dependency");
+import { Dependency } from "./dependency";
 
-const compileToIr = (path, depGraph, config) => {
+export const compileToIr = (
+  path: string,
+  depGraph: Dependency,
+  config: SheerConfig
+): any => {
   try {
     const source = loader.loadFile(path);
     const program = parse(source);
@@ -28,25 +32,20 @@ const compileToIr = (path, depGraph, config) => {
   }
 };
 
-const fromNsToIr = (ns, depGraph, config) => {
+export const fromNsToIr = (
+  ns: string,
+  depGraph: Dependency,
+  config: SheerConfig
+) => {
   const path = utils.nameToPath(ns, config);
   return compileToIr(path, depGraph, config);
 };
 
-const loadFromDeps = (deps, depGraph, config) => {
-  const toLoadDeps = deps
-    .map(ns => fromNsToIr(ns, depGraph, config))
-    .map(f => f.deps())
-    .flat()
-    .filter((v, i, arr) => arr.indexOf(v) === i)
-    .filter(ns => !depGraph.files(ns));
-
-  if (!toLoadDeps.length) return;
-
-  loadFromDeps(toLoadDeps, depGraph, config);
-};
-
-const loadFolder = (folderName, depGraph, config) => {
+export const loadFolder = (
+  folderName: string,
+  depGraph: Dependency,
+  config: SheerConfig
+) => {
   if (!fs.existsSync(folderName)) return;
 
   const allInFolder = fs
@@ -62,9 +61,9 @@ const loadFolder = (folderName, depGraph, config) => {
   folders.forEach(folder => loadFolder(folder, depGraph, config));
 };
 
-module.exports = () => {
-  const config = project.loadConfig();
-  const depGraph = dependency(config);
+export const compile = () => {
+  const config = loadConfig();
+  const depGraph = new Dependency(config);
 
   try {
     loadFolder(config.rootSource, depGraph, config);
@@ -74,7 +73,7 @@ module.exports = () => {
 
     const files = depGraph
       .files()
-      .map(([ns, file]) => [ns, compile(file, ns, config)])
+      .map(([ns, file]) => [ns, compiler(file, ns, config)])
       .forEach(([ns, file]) => {
         const filePath = utils.nameToPath(ns, config, true);
         loader.writeFile(filePath, file.compiled.code);
@@ -84,8 +83,3 @@ module.exports = () => {
     process.exit();
   }
 };
-
-module.exports.irToJs = compile;
-module.exports.dependency = dependency;
-module.exports.fromNsToIr = fromNsToIr;
-module.exports.compileToIr = compileToIr;

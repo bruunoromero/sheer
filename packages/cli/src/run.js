@@ -1,10 +1,11 @@
-const compiler = require("@sheer/lang");
-const { fork } = require("child_process");
-const project = require("@sheer/lang/src/project");
+const compiler = require("@sheer/lang")
+const { fork } = require("child_process")
+
+const project = require("@sheer/lang/dist/src/project")
 
 module.exports = () => {
-  compiler();
-  const config = project.config();
+  compiler.compile()
+  const config = project.config()
 
-  fork(config.entryCompiled);
-};
+  fork(config.entryCompiled)
+}
