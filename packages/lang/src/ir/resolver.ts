@@ -1,25 +1,26 @@
-const t = require("./types");
+import { IrType } from "./types";
+
 const transformer = require("./transformer");
 
-const resolve = (node, ctx) => {
+export const resolve = (node, ctx) => {
   switch (node.type) {
-    case t.BIN_OP:
-    case t.LOG_OP:
+    case IrType.BIN_OP:
+    case IrType.LOG_OP:
       return resolveBinary(node, ctx);
-    case t.IF:
+    case IrType.IF:
       return resolveIF(node, ctx);
-    case t.VECTOR:
+    case IrType.VECTOR:
       return resolveVector(node, ctx);
-    case t.NOT:
+    case IrType.NOT:
       return resolveNot(node, ctx);
-    case t.SYMBOL:
+    case IrType.SYMBOL:
       return resolveSymbol(node, ctx);
   }
 
   return node;
 };
 
-const resolveIF = (node, ctx) => {
+export const resolveIF = (node, ctx) => {
   node.cond = resolve(node.cond, ctx);
   node.truthy = resolve(node.truthy, ctx);
   node.falsy = resolve(node.falsy, ctx);
@@ -27,25 +28,25 @@ const resolveIF = (node, ctx) => {
   return node;
 };
 
-const resolveBinary = (node, ctx) => {
+export const resolveBinary = (node, ctx) => {
   node.left = resolve(node.left, ctx);
   node.right = resolve(node.right, ctx);
 
   return node;
 };
 
-const resolveNot = (node, ctx) => {
+export const resolveNot = (node, ctx) => {
   node.value = resolve(node, ctx);
   return node;
 };
 
-const resolveVector = (node, ctx) => {
+export const resolveVector = (node, ctx) => {
   node.value = node.value.map(el => resolve(el, ctx));
   return node;
 };
 
-const resolveSymbol = (node, ctx) => {
-  if (node.type === t.SYMBOL) {
+export const resolveSymbol = (node, ctx) => {
+  if (node.type === IrType.SYMBOL) {
     const resolved = ctx.resolve(node.value);
 
     if (Array.isArray(resolved)) {
@@ -57,10 +58,3 @@ const resolveSymbol = (node, ctx) => {
 
   return node;
 };
-
-module.exports = resolve;
-module.exports.resolveIf = resolveIF;
-module.exports.resolveNot = resolveNot;
-module.exports.resolveBinary = resolveBinary;
-module.exports.resolveVector = resolveVector;
-module.exports.resolveSymbol = resolveSymbol;

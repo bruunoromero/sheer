@@ -1,18 +1,17 @@
 const utils = require("../utils");
-const t = require("../parser/types");
 
-const context = require("./context");
+const { Context } = require("./context");
 const validator = require("./validator");
 const transformer = require("./transformer");
 
 const traverseArgs = (args, ctx, traverse) =>
   args.map(el => traverse(el, ctx)).filter(e => e);
 
-const coreFunction = (validateFn, fn) => validator => (
+const coreFunction = (validateFn, fn: (...args) => any) => validator => (
   meta,
   args,
   ctx,
-  traverse
+  traverse?: Function
 ) => {
   validateFn(validator, meta, args, ctx);
 
@@ -25,8 +24,8 @@ const fnCall = coreFunction(validator.ok, (meta, args, ctx, traverse) => {
   return transformer.fnCall(callee, traverseArgs(args, ctx, traverse));
 });
 
-const fn = coreFunction(validator.fn, (meta, args, ctx, traverse) => {
-  const fCtx = context(ctx);
+const fn = coreFunction(validator.fn, (meta, args, ctx, traverse?: any) => {
+  const fCtx = new Context(ctx);
   const params = traverse(args[0], fCtx);
   const rest = params.value.some(el => el.value === "&");
 
@@ -218,7 +217,7 @@ const keywordCall = coreFunction(
   }
 );
 
-module.exports = validator => {
+export const init = validator => {
   return {
     ns: ns(validator),
     fn: fn(validator),

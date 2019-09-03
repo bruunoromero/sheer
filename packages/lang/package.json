@@ -25,6 +25,8 @@
     "rimraf": "^3.0.0"
   },
   "devDependencies": {
+    "@types/babel-code-frame": "^6.20.2",
+    "@types/babel-types": "^7.0.7",
     "@types/node": "^12.7.3",
     "@types/parsimmon": "^1.10.0",
     "@types/ramda": "^0.26.21",

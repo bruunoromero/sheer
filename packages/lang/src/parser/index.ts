@@ -1,4 +1,4 @@
-import * as language from "./language";
+import { language } from "./language";
 import { buildList, buildSymbol, buildKeyword, buildVector } from "./utils";
 
 import * as utils from "../utils";

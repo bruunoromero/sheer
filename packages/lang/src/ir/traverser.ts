@@ -1,6 +1,6 @@
 const R = require("ramda");
 
-const resolve = require("./resolver");
+import { resolve } from "./resolver";
 const transformer = require("./transformer");
 
 import { ParserType } from "./../parser/types";

@@ -1,7 +1,7 @@
-const P = require("parsimmon");
+import * as P from "parsimmon";
 const t = require("./transformer");
 
-module.exports = P.createLanguage({
+export const language = P.createLanguage({
   Expression: r => {
     return P.alt(
       r.Keyword,
@@ -30,7 +30,7 @@ module.exports = P.createLanguage({
   },
 
   Keyword: r => {
-    return P.seqObj(P.string(":"), ["symbol", r.Symbol])
+    return P.seqObj<any>(P.string(":"), ["symbol", r.Symbol])
       .mark()
       .map(({ start, end, value }) => ({
         start,

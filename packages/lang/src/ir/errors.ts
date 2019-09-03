@@ -1,23 +1,23 @@
-const colors = require("colors/safe");
+import * as colors from "colors/safe";
 
 const errorMessage = fn => (...args) => {
   return `\n${colors.red(fn.apply(null, args))}\n`;
 };
 
-module.exports.invalidNumberOfArgs = errorMessage(
-  (fnName, argsNumber, expected) => {
+export const invalidNumberOfArgs = errorMessage(
+  (fnName: string, argsNumber: number, expected: number) => {
     return `Invalid number of arguments for function \`${fnName}\`. Was expected \`${expected}\`, but was provided \`${argsNumber}\``;
   }
 );
 
-module.exports.invalidTypeProvided = errorMessage(
-  (fnName, typeProvided, expected) => {
+export const invalidTypeProvided = errorMessage(
+  (fnName: string, typeProvided: string, expected: string) => {
     return `Invalid argument provided for function \`${fnName}\`. Was expected type \`${expected}\`, but was provided type \`${typeProvided}\``;
   }
 );
 
-module.exports.atLeastNumberOfArguments = errorMessage(
-  (fnName, argsNumber, expected) => {
+export const atLeastNumberOfArguments = errorMessage(
+  (fnName: string, argsNumber: string, expected: string) => {
     return `Invalid number of arguments for function \`${fnName}\`. Was expected at least \`${expected}\`, but was provided \`${argsNumber}\``;
   }
 );

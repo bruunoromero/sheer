@@ -1,7 +1,7 @@
 const babel = require("@babel/types");
 
-const t = require("../ir/types");
-const utils = require("../utils");
+import * as utils from "../utils";
+import { IrType } from "../ir/types";
 const transformer = require("./transformer");
 
 module.exports = (ir, config) => {
@@ -36,38 +36,38 @@ module.exports = (ir, config) => {
 
 const traverse = (node, config) => {
   switch (node.type) {
-    case t.STRING:
-    case t.KEYWORD:
+    case IrType.STRING:
+    case IrType.KEYWORD:
       return transformer.string(node, traverse);
-    case t.DECLARE:
+    case IrType.DECLARE:
       return transformer.declare(node, traverse);
-    case t.DEF:
+    case IrType.DEF:
       return transformer.def(node, traverse);
-    case t.NUMBER:
+    case IrType.NUMBER:
       return transformer.number(node, traverse);
-    case t.BOOL:
+    case IrType.BOOL:
       return transformer.bool(node, traverse);
-    case t.IF:
+    case IrType.IF:
       return transformer.if_(node, traverse);
-    case t.SYMBOL:
+    case IrType.SYMBOL:
       return transformer.symbol(node, traverse);
-    case t.NULL:
+    case IrType.NULL:
       return transformer.null_(node, traverse);
-    case t.BIN_OP:
+    case IrType.BIN_OP:
       return transformer.binOp(node, traverse);
-    case t.LOG_OP:
+    case IrType.LOG_OP:
       return transformer.logOp(node, traverse);
-    case t.FN:
+    case IrType.FN:
       return transformer.fn(node, traverse);
-    case t.MEMBER:
+    case IrType.MEMBER:
       return transformer.member(node, traverse);
-    case t.VECTOR:
+    case IrType.VECTOR:
       return transformer.vector(node, traverse);
-    case t.FN_CALL:
+    case IrType.FN_CALL:
       return transformer.fnCall(node, traverse);
-    case t.REQUIRE:
+    case IrType.REQUIRE:
       return transformer.require_(node, traverse, config);
-    case t.IMPORT:
+    case IrType.IMPORT:
       return transformer.import_(node, traverse, config);
   }
 

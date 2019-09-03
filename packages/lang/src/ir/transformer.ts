@@ -1,5 +1,5 @@
-const t = require("./types");
-const utils = require("../utils");
+import { IrType } from "./types";
+import * as utils from "../utils";
 
 const manyOp = (args, op) => {
   const els = args.slice(0, -1);
@@ -14,17 +14,17 @@ const manyOp = (args, op) => {
 };
 
 const true_ = {
-  type: t.BOOL,
+  type: IrType.BOOL,
   value: true
 };
 
 const false_ = {
-  type: t.BOOL,
+  type: IrType.BOOL,
   value: false
 };
 
 const null_ = {
-  type: t.NULL,
+  type: IrType.NULL,
   value: null
 };
 
@@ -38,14 +38,14 @@ module.exports.primitive = ({ value, type }) => {
 module.exports.string = value => {
   return {
     value,
-    type: t.STRING
+    type: IrType.STRING
   };
 };
 
 module.exports.vector = value => {
   return {
     value,
-    type: t.VECTOR
+    type: IrType.VECTOR
   };
 };
 
@@ -54,20 +54,20 @@ module.exports.fn = (params, body, rest) => {
     rest,
     body,
     params,
-    type: t.FN
+    type: IrType.FN
   };
 };
 
 module.exports.symbol = ({ value }) => {
-  return { type: t.SYMBOL, value };
+  return { type: IrType.SYMBOL, value };
 };
 
 module.exports.if_ = (cond, truthy, falsy) => {
-  return { type: t.IF, cond, truthy, falsy };
+  return { type: IrType.IF, cond, truthy, falsy };
 };
 
 module.exports.when = (cond, truthy) => {
-  return { type: t.IF, cond, truthy, falsy: null_ };
+  return { type: IrType.IF, cond, truthy, falsy: null_ };
 };
 
 module.exports.def = (sym, expr) => {
@@ -76,7 +76,7 @@ module.exports.def = (sym, expr) => {
   return {
     name,
     value: expr,
-    type: t.DEF
+    type: IrType.DEF
   };
 };
 
@@ -84,7 +84,7 @@ const logOp = (args, op) => {
   if (args.length > 2) {
     return {
       op,
-      type: t.LOG_OP,
+      type: IrType.LOG_OP,
       left: args[0],
       right: logOp(args.slice(1), op)
     };
@@ -92,18 +92,18 @@ const logOp = (args, op) => {
 
   return {
     op,
-    type: t.LOG_OP,
+    type: IrType.LOG_OP,
     left: args[0],
     right: args[1]
   };
 };
 
-const binOp = (args, op, notJoining) => {
+const binOp = (args, op, notJoining?: boolean) => {
   if (args.length > 2) {
     if (notJoining) {
       return {
         op,
-        type: t.LOG_OP,
+        type: IrType.LOG_OP,
         left: args[0],
         right: binOp(args.slice(1), op, notJoining)
       };
@@ -114,7 +114,7 @@ const binOp = (args, op, notJoining) => {
 
   return {
     op,
-    type: t.BIN_OP,
+    type: IrType.BIN_OP,
     left: args[0],
     right: args[1]
   };
@@ -125,7 +125,7 @@ module.exports.declare = (value, init, isGlobal) => {
     init,
     value,
     isGlobal,
-    type: t.DECLARE
+    type: IrType.DECLARE
   };
 };
 
@@ -134,7 +134,7 @@ module.exports.member = ([owner, member], unnomralized) => {
     owner,
     member,
     unnomralized,
-    type: t.MEMBER
+    type: IrType.MEMBER
   };
 };
 
@@ -142,14 +142,14 @@ module.exports.fnCall = (callee, args) => {
   return {
     args,
     callee,
-    type: t.FN_CALL
+    type: IrType.FN_CALL
   };
 };
 
 module.exports.list = () => {
   return {
     value: [],
-    type: t.VECTOR
+    type: IrType.VECTOR
   };
 };
 
@@ -159,7 +159,7 @@ module.exports.require_ = (ns, as, refer, fromNs) => {
     as,
     refer,
     fromNs,
-    type: t.REQUIRE
+    type: IrType.REQUIRE
   };
 };
 
@@ -168,7 +168,7 @@ module.exports.import_ = (path, as, fromNs) => {
     as,
     path,
     fromNs,
-    type: t.IMPORT
+    type: IrType.IMPORT
   };
 };
 

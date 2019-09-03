@@ -1,9 +1,10 @@
-const codeFrame = require("@babel/code-frame");
+import * as colors from "colors/safe";
+import * as codeFrame from "@babel/code-frame";
 
-const utils = require("../utils");
-const errors = require("./errors");
-const colors = require("colors/safe");
+import * as utils from "../utils";
 import { ParserType } from "../parser/types";
+
+import * as errors from "./errors";
 
 const invalidTypeProvided = (validator, fnName, arg, type) => {
   if (arg.type !== type) {
@@ -112,8 +113,8 @@ export const require_ = (validator, meta, args) => {
     () => {
       const ns = args[0].value[0];
       const rest = utils.chunks(args[0].value.slice(1), 2);
-      const as = rest.filter(el => el[0].value === "as")[0];
-      const refer = rest.filter(el => el[0].value === "refer")[0];
+      const as = rest.filter((el: any) => el[0].value === "as")[0];
+      const refer = rest.filter((el: any) => el[0].value === "refer")[0];
 
       //TODO: Do something when as or refer has only one element
 

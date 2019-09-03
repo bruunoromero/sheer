@@ -73,7 +73,7 @@ export const compile = () => {
 
     const files = depGraph
       .files()
-      .map(([ns, file]) => [ns, compiler(file, ns, config)])
+      .map(([ns, file]) => [ns, compiler.compile(file, ns, config)])
       .forEach(([ns, file]) => {
         const filePath = utils.nameToPath(ns, config, true);
         loader.writeFile(filePath, file.compiled.code);
