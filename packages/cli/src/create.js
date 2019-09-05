@@ -1,12 +1,12 @@
 const fs = require("fs")
 const path = require("path")
 const decamelize = require("decamelize")
-const utils = require("@sheer/lang/dist/src/utils.js")
+const utils = require("@sheer/lang/dist/utils.js")
 
 const {
   DEFAULT_CONFIG,
   ENTRY_NAME
-} = require("@sheer/lang/dist/src/project.js")
+} = require("@sheer/lang/dist/project.js")
 
 const buildJson = name => Object.assign({}, { name }, DEFAULT_CONFIG)
 

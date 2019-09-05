@@ -1,6 +1,6 @@
 import { ParserList } from "../../parser/ast";
 import * as utils from "../../utils";
-import { IrImportNode } from "../ast/import";
+import { ExImportNode } from "../ast/import";
 import {
   ExKeywordNode,
   ExStringNode,
@@ -16,7 +16,7 @@ export class ImportTraverser extends ATraverser {
     return "import";
   }
 
-  traverse(node: ParserList): IrImportNode {
+  traverse(node: ParserList): ExImportNode {
     const args = this.args(node);
 
     const importStmt = this.traverser.traverseAndValidate(
@@ -34,7 +34,7 @@ export class ImportTraverser extends ATraverser {
 
     const as_ = maybeAs ? maybeAs[1] : null;
 
-    return new IrImportNode(node.loc, path as ExStringNode, as_);
+    return new ExImportNode(node.loc, path as ExStringNode, as_);
   }
 
   validate(node: ParserList): boolean {

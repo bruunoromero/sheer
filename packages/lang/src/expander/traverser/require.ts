@@ -4,7 +4,7 @@ import { ExNode } from "../ast/node";
 import { ExKeywordNode, ExVectorNode, ExSymbolNode } from "../ast/primitives";
 
 import { ATraverser } from "./atraverser";
-import { IrRequireNode } from "../ast/require";
+import { ExRequireNode } from "../ast/require";
 import { ParserType } from "../../parser/types";
 
 export class RequireTraverser extends ATraverser {
@@ -12,7 +12,7 @@ export class RequireTraverser extends ATraverser {
     return "require";
   }
 
-  traverse(node: ParserList): IrRequireNode {
+  traverse(node: ParserList): ExRequireNode {
     const args = this.args(node);
 
     const requiresVector = this.traverser.traverseAndValidate(
@@ -34,7 +34,7 @@ export class RequireTraverser extends ATraverser {
     const as_ = maybeAs ? maybeAs[1] : null;
     const refer = maybeRefer ? maybeRefer[1] : null;
 
-    return new IrRequireNode(node.loc, ns as ExSymbolNode, as_, refer);
+    return new ExRequireNode(node.loc, ns as ExSymbolNode, as_, refer);
   }
 
   validate(node: ParserList): boolean {

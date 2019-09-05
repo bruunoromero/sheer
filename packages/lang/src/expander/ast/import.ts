@@ -3,7 +3,7 @@ import { ExType } from "../types";
 import { Location } from "../../parser/ast";
 import { ExStringNode, ExSymbolNode } from "./primitives";
 
-export class IrImportNode extends ExNode {
+export class ExImportNode extends ExNode {
   constructor(
     loc: Location,
     public readonly path: ExStringNode,

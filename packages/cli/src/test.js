@@ -1,6 +1,6 @@
 const compiler = require("@sheer/lang")
 const { runCLI } = require("@jest/core")
-const project = require("@sheer/lang/dist/src/project")
+const project = require("@sheer/lang/dist/project")
 // Add any Jest configuration options here
 
 module.exports = async () => {
