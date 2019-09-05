@@ -1,6 +1,9 @@
-export enum IrType {
+export enum ExType {
+  NS = "NS",
   FN = "FN",
   IF = "IF",
+  SET = "SET",
+  MAP = "MAP",
   NOT = "NOT",
   DEF = "DEF",
   NULL = "NULL",
@@ -17,5 +20,6 @@ export enum IrType {
   KEYWORD = "KEYWORD",
   REQUIRE = "REQUIRE",
   DECLARE = "DECLARE",
-  FN_CALL = "FN_CALL"
+  FN_CALL = "FN_CALL",
+  NATIVE_CALL = "NATIVE_CALL"
 }

@@ -1,4 +1,3 @@
-import { SheerConfig } from "./project";
 import * as fs from "fs";
 import * as R from "ramda";
 import * as path from "path";

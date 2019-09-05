@@ -1,4 +1,4 @@
-export const build = (type: string, value: any) => {
+export const build = (type: string, value: any): any => {
   return { loc: {}, type, value };
 };
 

@@ -5,7 +5,7 @@ import * as rimraf from "rimraf";
 import * as loader from "./loader";
 import { loadConfig, SheerConfig } from "./project";
 
-import ir from "./ir";
+import ir from "./expander";
 import * as utils from "./utils";
 import { parse } from "./parser";
 
@@ -54,7 +54,7 @@ export const loadFolder = (
 
   const folders = allInFolder.filter(path => fs.lstatSync(path).isDirectory());
 
-  const files = allInFolder
+  allInFolder
     .filter(path => !fs.lstatSync(path).isDirectory())
     .forEach(path => compileToIr(path, depGraph, config));
 
@@ -71,7 +71,7 @@ export const compile = () => {
 
     rimraf.sync(config.outSource);
 
-    const files = depGraph
+    depGraph
       .files()
       .map(([ns, file]) => [ns, compiler.compile(file, ns, config)])
       .forEach(([ns, file]) => {

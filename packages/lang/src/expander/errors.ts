@@ -1,6 +1,6 @@
 import * as colors from "colors/safe";
 
-const errorMessage = fn => (...args) => {
+const errorMessage = (fn: (...args: any[]) => string) => (...args: any[]) => {
   return `\n${colors.red(fn.apply(null, args))}\n`;
 };
 

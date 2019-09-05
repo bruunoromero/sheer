@@ -1,13 +1,12 @@
-import * as fs from "fs";
-import * as path from "path";
 import * as babelCore from "@babel/core";
 
 import { preset } from "./preset";
+import { SheerConfig } from "../project";
 const traverse = require("./traverser");
 
-export const compile = (file, ns, config) => {
+export const compile = (file, ns, config: SheerConfig) => {
   const generated = babelCore.transformFromAst(
-    traverse(file.program(), { ns, ...config }),
+    traverse(file.program, { ns, ...config }),
     null,
     {
       presets: [preset]

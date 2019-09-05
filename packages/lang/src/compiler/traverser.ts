@@ -1,7 +1,7 @@
 const babel = require("@babel/types");
 
 import * as utils from "../utils";
-import { IrType } from "../ir/types";
+import { ExType } from "../expander/types";
 const transformer = require("./transformer");
 
 module.exports = (ir, config) => {
@@ -36,40 +36,40 @@ module.exports = (ir, config) => {
 
 const traverse = (node, config) => {
   switch (node.type) {
-    case IrType.STRING:
-    case IrType.KEYWORD:
+    case ExType.STRING:
+    case ExType.KEYWORD:
       return transformer.string(node, traverse);
-    case IrType.DECLARE:
+    case ExType.DECLARE:
       return transformer.declare(node, traverse);
-    case IrType.DEF:
+    case ExType.DEF:
       return transformer.def(node, traverse);
-    case IrType.NUMBER:
+    case ExType.NUMBER:
       return transformer.number(node, traverse);
-    case IrType.BOOL:
+    case ExType.BOOL:
       return transformer.bool(node, traverse);
-    case IrType.IF:
+    case ExType.IF:
       return transformer.if_(node, traverse);
-    case IrType.SYMBOL:
+    case ExType.SYMBOL:
       return transformer.symbol(node, traverse);
-    case IrType.NULL:
+    case ExType.NULL:
       return transformer.null_(node, traverse);
-    case IrType.BIN_OP:
+    case ExType.BIN_OP:
       return transformer.binOp(node, traverse);
-    case IrType.LOG_OP:
+    case ExType.LOG_OP:
       return transformer.logOp(node, traverse);
-    case IrType.FN:
+    case ExType.FN:
       return transformer.fn(node, traverse);
-    case IrType.MEMBER:
+    case ExType.MEMBER:
       return transformer.member(node, traverse);
-    case IrType.VECTOR:
+    case ExType.VECTOR:
       return transformer.vector(node, traverse);
-    case IrType.FN_CALL:
+    case ExType.FN_CALL:
       return transformer.fnCall(node, traverse);
-    case IrType.REQUIRE:
+    case ExType.REQUIRE:
       return transformer.require_(node, traverse, config);
-    case IrType.IMPORT:
+    case ExType.IMPORT:
       return transformer.import_(node, traverse, config);
   }
 
-  throw `could not traverse type ${node.type} at compiler`;
+  // throw `could not traverse type ${node.type} at compiler`;
 };
