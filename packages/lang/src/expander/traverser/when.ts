@@ -1,9 +1,9 @@
-import { ATraverser } from "./atraverser";
-import { ParserList, ParserNull } from "../../parser/ast";
+import { AExTraverser } from "./atraverser";
+import { ParserList } from "../../parser/ast";
 import { ExIfNode } from "../ast/if";
 import { ExNullNode } from "../ast/primitives";
 
-export class WhenTraverser extends ATraverser {
+export class ExWhenTraverser extends AExTraverser {
   get fnName() {
     return "when";
   }

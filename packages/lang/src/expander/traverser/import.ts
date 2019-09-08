@@ -8,10 +8,10 @@ import {
   ExVectorNode
 } from "../ast/primitives";
 
-import { ATraverser } from "./atraverser";
+import { AExTraverser } from "./atraverser";
 import { ParserType } from "../../parser/types";
 
-export class ImportTraverser extends ATraverser {
+export class ExImportTraverser extends AExTraverser {
   get fnName(): string {
     return "import";
   }

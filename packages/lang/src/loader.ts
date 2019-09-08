@@ -1,6 +1,9 @@
 import * as fs from "fs";
 import * as path from "path";
-import * as utils from "./utils";
+
+import * as ir from "./ir";
+import * as parser from "./parser";
+import * as expander from "./expander";
 
 const ensureDirectoryExistence = (filePath: string) => {
   const dirname = path.dirname(filePath);
@@ -12,8 +15,17 @@ const ensureDirectoryExistence = (filePath: string) => {
   fs.mkdirSync(dirname);
 };
 
-export const loadFile = (path: string): string => {
-  return fs.readFileSync(path, "utf8");
+export const loadFile = (path: string): ir.IrFile => {
+  try {
+    const source = fs.readFileSync(path, "utf8");
+    const program = parser.transform(source);
+
+    const file = expander.transform(path, source, program);
+
+    return ir.transform(file);
+  } catch (e) {
+    console.log(e);
+  }
 };
 
 export const writeFile = (path: string, source: string) => {

@@ -2,11 +2,14 @@ import * as path from "path";
 import * as babel from "@babel/types";
 
 import * as utils from "../utils";
+import { IrDefNode } from "../ir/ast/def";
+import { IrSymbolNode } from "../ir/ast/primitives";
 
 export const statement = node => {
   if (
     node.type.toLowerCase().indexOf("expression") > -1 ||
-    node.type.toLowerCase().indexOf("literal") > -1
+    node.type.toLowerCase().indexOf("literal") > -1 ||
+    node.type.toLowerCase().indexOf("indentifier") > -1
   ) {
     return babel.expressionStatement(node);
   }
@@ -23,8 +26,8 @@ const returnLast = (curr, index, exprs) => {
 };
 
 const toRestIfNeeded = (node, params) => {
-  if (node.rest) {
-    const init = params.slice(0, -2);
+  if (node.isRest) {
+    const init = params.slice(0, -1);
     const rest = babel.restElement(params.slice(-1)[0]);
 
     return init.concat([rest]);
@@ -63,25 +66,25 @@ export const declare = (node, traverse) => {
 };
 
 export const member = (node, traverse) => {
-  const member = traverse(node.member);
+  const member = traverse(node.prop);
   const callee = traverse(node.owner);
 
-  return babel.memberExpression(callee, member, !babel.isIdentifier(member));
+  return babel.memberExpression(callee, member, true);
 };
 
-export const def = (node, traverse) => {
+export const def = (node: IrDefNode, traverse) => {
   return babel.assignmentExpression(
     "=",
     babel.memberExpression(
       babel.identifier(utils.GLOBALS),
-      babel.stringLiteral(node.name),
+      babel.stringLiteral(node.name.value),
       true
     ),
     traverse(node.value)
   );
 };
 
-export const symbol = node => {
+export const symbol = (node: IrSymbolNode) => {
   return babel.identifier(utils.normalizeName(node.value));
 };
 
@@ -157,6 +160,15 @@ export const require_ = (node, traverse, config) => {
     [babel.importDefaultSpecifier(as || name)],
     babel.stringLiteral(resolvedPath)
   );
+};
+
+export const nativeCall = (node, traverse) => {
+  const member = babel.memberExpression(
+    traverse(node.callee),
+    traverse(node.fn),
+    true
+  );
+  return babel.callExpression(member, node.args.map(traverse));
 };
 
 export const import_ = (node, traverse, config) => {

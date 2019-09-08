@@ -1,8 +1,9 @@
 const babel = require("@babel/types");
 
 import * as utils from "../utils";
-import { ExType } from "../expander/types";
-const transformer = require("./transformer");
+
+import { IrType } from "../ir/types";
+import * as transformer from "./transformer";
 
 module.exports = (ir, config) => {
   const langCore = babel.importDeclaration(
@@ -36,40 +37,39 @@ module.exports = (ir, config) => {
 
 const traverse = (node, config) => {
   switch (node.type) {
-    case ExType.STRING:
-    case ExType.KEYWORD:
-      return transformer.string(node, traverse);
-    case ExType.DECLARE:
-      return transformer.declare(node, traverse);
-    case ExType.DEF:
+    case IrType.STRING:
+      return transformer.string(node);
+    case IrType.DEF:
       return transformer.def(node, traverse);
-    case ExType.NUMBER:
-      return transformer.number(node, traverse);
-    case ExType.BOOL:
-      return transformer.bool(node, traverse);
-    case ExType.IF:
+    case IrType.NUMBER:
+      return transformer.number(node);
+    case IrType.BOOL:
+      return transformer.bool(node);
+    case IrType.IF:
       return transformer.if_(node, traverse);
-    case ExType.SYMBOL:
-      return transformer.symbol(node, traverse);
-    case ExType.NULL:
-      return transformer.null_(node, traverse);
-    case ExType.BIN_OP:
-      return transformer.binOp(node, traverse);
-    case ExType.LOG_OP:
+    case IrType.SYMBOL:
+      return transformer.symbol(node);
+    case IrType.NULL:
+      return transformer.null_();
+    case IrType.LOG_OP:
       return transformer.logOp(node, traverse);
-    case ExType.FN:
+    case IrType.FN:
       return transformer.fn(node, traverse);
-    case ExType.MEMBER:
+    case IrType.MEMBER:
       return transformer.member(node, traverse);
-    case ExType.VECTOR:
+    case IrType.VECTOR:
       return transformer.vector(node, traverse);
-    case ExType.FN_CALL:
+    case IrType.FN_CALL:
       return transformer.fnCall(node, traverse);
-    case ExType.REQUIRE:
+    case IrType.REQUIRE:
       return transformer.require_(node, traverse, config);
-    case ExType.IMPORT:
+    case IrType.IMPORT:
       return transformer.import_(node, traverse, config);
+    case IrType.EXPRESSION:
+      return traverse(node.value, config);
+    case IrType.NATIVE_CALL:
+      return transformer.nativeCall(node, traverse);
   }
 
-  // throw `could not traverse type ${node.type} at compiler`;
+  throw `could not traverse type ${node.type} at compiler`;
 };

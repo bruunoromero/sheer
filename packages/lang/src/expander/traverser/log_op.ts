@@ -1,16 +1,16 @@
-import { ATraverser } from "./atraverser";
+import { AExTraverser } from "./atraverser";
 import { ParserList } from "../../parser/ast";
 import { ExNode } from "../ast/node";
 import { ExBoolNode } from "../ast/primitives";
 import { ExLogOpNode } from "../ast/log_op";
 import { Validator } from "../../validator";
-import { Traverser } from ".";
+import { ExTraverser } from ".";
 
-export class LogOpTraverser extends ATraverser {
+export class ExLogOpTraverser extends AExTraverser {
   constructor(
     private readonly op: string,
     protected readonly validator: Validator,
-    protected readonly traverser: Traverser
+    protected readonly traverser: ExTraverser
   ) {
     super(validator, traverser);
   }

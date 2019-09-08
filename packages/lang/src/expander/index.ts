@@ -1,11 +1,11 @@
 import { Validator } from "../validator";
 import { ParserConcreteNode } from "../parser/ast";
-import { Traverser } from "./traverser";
+import { ExTraverser } from "./traverser";
 import { ExNode } from "./ast/node";
 import { ExType } from "./types";
 import { ExNamespaceNode } from "./ast/namespace";
 
-export class File {
+export class ExFile {
   constructor(
     public readonly path: string,
     public readonly source: string,
@@ -13,9 +13,13 @@ export class File {
   ) {}
 }
 
-export default (path: string, source: string, ast: ParserConcreteNode[]) => {
+export const transform = (
+  path: string,
+  source: string,
+  ast: ParserConcreteNode[]
+): ExFile => {
   const validator = new Validator(path, source);
-  const traverser = new Traverser(validator);
+  const traverser = new ExTraverser(validator);
 
   let irAst = ast.map(node => traverser.traverseAndValidate(node));
 
@@ -28,7 +32,5 @@ export default (path: string, source: string, ast: ParserConcreteNode[]) => {
       .concat(irAst.slice(1));
   }
 
-  console.log(irAst);
-
-  return new File(path, source, irAst);
+  return new ExFile(path, source, irAst);
 };

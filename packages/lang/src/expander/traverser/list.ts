@@ -1,36 +1,36 @@
 import { ParserList } from "../../parser/ast";
 import { ParserType } from "../../parser/types";
 import { ExNode } from "../ast/node";
-import { ATraverser } from "./atraverser";
-import { FnTraverser } from "./fn";
-import { FnCallTraverser } from "./fn_call";
-import { NamespaceTraverser } from "./namespace";
-import { ImportTraverser } from "./import";
-import { KeywordCallTraverser } from "./keyword_call";
-import { NativeCallTraverser } from "./native_call";
-import { RequireTraverser } from "./require";
-import { DefTraverser } from "./def";
-import { DefnTraverser } from "./defn";
 import { ExVectorNode } from "../ast/primitives";
-import { IfTraverser } from "./if";
-import { WhenTraverser } from "./when";
-import { LogOpTraverser } from "./log_op";
+import { AExTraverser } from "./atraverser";
+import { ExDefTraverser } from "./def";
+import { ExDefnTraverser } from "./defn";
+import { ExFnTraverser } from "./fn";
+import { ExFnCallTraverser } from "./fn_call";
+import { ExIfTraverser } from "./if";
+import { ExImportTraverser } from "./import";
+import { ExKeywordCallTraverser } from "./keyword_call";
+import { ExLogOpTraverser } from "./log_op";
+import { ExNamespaceTraverser } from "./namespace";
+import { ExNativeCallTraverser } from "./native_call";
+import { ExRequireTraverser } from "./require";
+import { ExWhenTraverser } from "./when";
 
-export class ListTraverser extends ATraverser {
+export class ExListTraverser extends AExTraverser {
   traverse(node: ParserList): ExNode {
     const firstEl = node.value[0];
 
     if (!firstEl) return new ExVectorNode(node.loc, []);
 
     if (firstEl.type === ParserType.KEYWORD) {
-      return new KeywordCallTraverser(
+      return new ExKeywordCallTraverser(
         this.validator,
         this.traverser
       ).traverseAndValidate(node);
     }
 
     if (firstEl.value[0] === ".") {
-      return new NativeCallTraverser(
+      return new ExNativeCallTraverser(
         this.validator,
         this.traverser
       ).traverseAndValidate(node);
@@ -38,73 +38,73 @@ export class ListTraverser extends ATraverser {
 
     switch (firstEl.value) {
       case "ns":
-        return new NamespaceTraverser(
+        return new ExNamespaceTraverser(
           this.validator,
           this.traverser
         ).traverseAndValidate(node);
       case "fn":
-        return new FnTraverser(
+        return new ExFnTraverser(
           this.validator,
           this.traverser
         ).traverseAndValidate(node);
       case "def":
-        return new DefTraverser(
+        return new ExDefTraverser(
           false,
           this.validator,
           this.traverser
         ).traverseAndValidate(node);
       case "def-":
-        return new DefTraverser(
+        return new ExDefTraverser(
           true,
           this.validator,
           this.traverser
         ).traverseAndValidate(node);
       case "defn":
-        return new DefnTraverser(
+        return new ExDefnTraverser(
           false,
           this.validator,
           this.traverser
         ).traverseAndValidate(node);
       case "defn-":
-        return new DefnTraverser(
+        return new ExDefnTraverser(
           false,
           this.validator,
           this.traverser
         ).traverseAndValidate(node);
       case "if":
-        return new IfTraverser(
+        return new ExIfTraverser(
           this.validator,
           this.traverser
         ).traverseAndValidate(node);
       case "when":
-        return new WhenTraverser(
+        return new ExWhenTraverser(
           this.validator,
           this.traverser
         ).traverseAndValidate(node);
       case "and":
-        return new LogOpTraverser(
+        return new ExLogOpTraverser(
           "&&",
           this.validator,
           this.traverser
         ).traverseAndValidate(node);
       case "or":
-        return new LogOpTraverser(
+        return new ExLogOpTraverser(
           "||",
           this.validator,
           this.traverser
         ).traverseAndValidate(node);
       case "require":
-        return new RequireTraverser(
+        return new ExRequireTraverser(
           this.validator,
           this.traverser
         ).traverseAndValidate(node);
       case "import":
-        return new ImportTraverser(
+        return new ExImportTraverser(
           this.validator,
           this.traverser
         ).traverseAndValidate(node);
       default:
-        return new FnCallTraverser(
+        return new ExFnCallTraverser(
           this.validator,
           this.traverser
         ).traverseAndValidate(node);

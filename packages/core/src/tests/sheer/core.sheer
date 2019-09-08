@@ -1,7 +1,0 @@
-(ns tests.sheer.core)
-
-(describe "" 
-  (fn []
-    (it "a"
-      (fn []
-        (log! "ola mundo")))))

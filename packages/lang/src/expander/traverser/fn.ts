@@ -1,10 +1,10 @@
 import { ParserList, ParserConcreteNode, Location } from "../../parser/ast";
 import { ExFnNode } from "../ast/fn";
-import { ATraverser } from "./atraverser";
+import { AExTraverser } from "./atraverser";
 import { ExSymbolNode, ExVectorNode } from "../ast/primitives";
 import { ParserType } from "../../parser/types";
 
-export class FnTraverser extends ATraverser {
+export class ExFnTraverser extends AExTraverser {
   get fnName(): string {
     return "fn";
   }
@@ -24,8 +24,8 @@ export class FnTraverser extends ATraverser {
     );
 
     const params = paramsVector.value.filter(
-      (el: ExSymbolNode) => el.value === "&"
-    );
+      (el: ExSymbolNode) => el.value !== "&"
+    ) as ExSymbolNode[];
 
     const body = this.traverseArgs(nodes.slice(1));
 

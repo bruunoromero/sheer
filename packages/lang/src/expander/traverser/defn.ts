@@ -1,11 +1,11 @@
 import { ParserList } from "../../parser/ast";
 import { ExDefNode } from "../ast/def";
-import { FnTraverser } from "./fn";
-import { DefTraverser } from "./def";
+import { ExFnTraverser } from "./fn";
+import { ExDefTraverser } from "./def";
 import { ExSymbolNode } from "../ast/primitives";
 import { ParserType } from "../../parser/types";
 
-export class DefnTraverser extends DefTraverser {
+export class ExDefnTraverser extends ExDefTraverser {
   get fnName(): string {
     return this.isPrivate ? "defn-" : "defn";
   }
@@ -15,7 +15,7 @@ export class DefnTraverser extends DefTraverser {
     const [sym, ...rest] = args;
     const name = this.traverser.traverseAndValidate(sym) as ExSymbolNode;
 
-    const value = new FnTraverser(
+    const value = new ExFnTraverser(
       this.validator,
       this.traverser
     ).transformWithLoc(node.loc, rest);

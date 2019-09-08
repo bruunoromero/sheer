@@ -5,40 +5,21 @@ import * as rimraf from "rimraf";
 import * as loader from "./loader";
 import { loadConfig, SheerConfig } from "./project";
 
-import ir from "./expander";
 import * as utils from "./utils";
-import { parse } from "./parser";
 
+import * as resolver from "./resolver";
 import * as compiler from "./compiler";
 
 import { Dependency } from "./dependency";
+import { IrFile } from "./ir";
 
-export const compileToIr = (
-  path: string,
-  depGraph: Dependency,
-  config: SheerConfig
-): any => {
-  try {
-    const source = loader.loadFile(path);
-    const program = parse(source);
-
-    const file = ir(path, source, program);
-
-    depGraph.addFile(file);
-
-    return file;
-  } catch (e) {
-    console.log(e);
-  }
+export const compileToIr = (path: string): any => {
+  return loader.loadFile(path);
 };
 
-export const fromNsToIr = (
-  ns: string,
-  depGraph: Dependency,
-  config: SheerConfig
-) => {
+export const fromNsToIr = (ns: string, config: SheerConfig) => {
   const path = utils.nameToPath(ns, config);
-  return compileToIr(path, depGraph, config);
+  return compileToIr(path);
 };
 
 export const loadFolder = (
@@ -56,14 +37,14 @@ export const loadFolder = (
 
   allInFolder
     .filter(path => !fs.lstatSync(path).isDirectory())
-    .forEach(path => compileToIr(path, depGraph, config));
+    .forEach(path => depGraph.addFile(compileToIr(path)));
 
   folders.forEach(folder => loadFolder(folder, depGraph, config));
 };
 
 export const compile = () => {
   const config = loadConfig();
-  const depGraph = new Dependency(config);
+  const depGraph = new Dependency();
 
   try {
     loadFolder(config.rootSource, depGraph, config);
@@ -71,12 +52,11 @@ export const compile = () => {
 
     rimraf.sync(config.outSource);
 
-    depGraph
-      .files()
+    (resolver.transform(depGraph) as [string, IrFile][])
       .map(([ns, file]) => [ns, compiler.compile(file, ns, config)])
       .forEach(([ns, file]) => {
-        const filePath = utils.nameToPath(ns, config, true);
-        loader.writeFile(filePath, file.compiled.code);
+        const filePath = utils.nameToPath(ns as string, config, true);
+        loader.writeFile(filePath, (file as any).compiled.code);
       });
   } catch (e) {
     console.log(e);

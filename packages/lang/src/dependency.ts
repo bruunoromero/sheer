@@ -1,16 +1,13 @@
-import * as utils from "./utils";
-import { File } from "./expander";
+import { IrFile } from "./ir";
 
 export class Dependency {
-  _config: any;
-  _files: { [name: string]: File };
+  _files: { [name: string]: IrFile };
 
-  constructor(config: any) {
-    this._config = config;
+  constructor() {
     this._files = {};
   }
 
-  files(name?: string): any {
+  files(name?: string): IrFile | [string, IrFile][] {
     if (name) {
       return this._files[name];
     }
@@ -18,11 +15,9 @@ export class Dependency {
     return Object.entries(this._files);
   }
 
-  addFile(file: File) {
-    const name = utils.pathToName(file.path, this._config);
+  addFile(file: IrFile) { 
+    if (this._files[file.ns]) return;
 
-    if (this._files[name]) return;
-
-    this._files[name] = file;
+    this._files[file.ns] = file;
   }
 }

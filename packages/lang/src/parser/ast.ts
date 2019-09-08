@@ -12,27 +12,11 @@ export interface Location {
 }
 
 export abstract class ParserNode<T> {
-  private _value: T;
-  private _type: ParserType;
-  private _loc: Location;
-
-  constructor(location: Location, value: T, type: ParserType) {
-    this._type = type;
-    this._value = value;
-    this._loc = location;
-  }
-
-  get type() {
-    return this._type;
-  }
-
-  get value() {
-    return this._value;
-  }
-
-  get loc() {
-    return this._loc;
-  }
+  constructor(
+    public readonly loc: Location,
+    public readonly value: T,
+    public readonly type: ParserType
+  ) {}
 }
 
 export type ParserConcreteNode =

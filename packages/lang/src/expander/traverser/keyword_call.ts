@@ -1,8 +1,8 @@
 import { ParserList } from "../../parser/ast";
 import { ExMemberNode } from "../ast/member";
-import { ATraverser } from "./atraverser";
+import { AExTraverser } from "./atraverser";
 
-export class KeywordCallTraverser extends ATraverser {
+export class ExKeywordCallTraverser extends AExTraverser {
   get fnName() {
     return ""
   }

@@ -3,11 +3,11 @@ import * as utils from "../../utils";
 import { ExNode } from "../ast/node";
 import { ExKeywordNode, ExVectorNode, ExSymbolNode } from "../ast/primitives";
 
-import { ATraverser } from "./atraverser";
+import { AExTraverser } from "./atraverser";
 import { ExRequireNode } from "../ast/require";
 import { ParserType } from "../../parser/types";
 
-export class RequireTraverser extends ATraverser {
+export class ExRequireTraverser extends AExTraverser {
   get fnName() {
     return "require";
   }

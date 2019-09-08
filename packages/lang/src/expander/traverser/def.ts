@@ -1,17 +1,17 @@
-import { Traverser } from ".";
+import { ExTraverser } from ".";
 import { ParserList } from "../../parser/ast";
 import { ParserType } from "../../parser/types";
 import { Validator } from "../../validator";
 import { ExDefNode } from "../ast/def";
 import { ExNode } from "../ast/node";
 import { ExSymbolNode } from "../ast/primitives";
-import { ATraverser } from "./atraverser";
+import { AExTraverser } from "./atraverser";
 
-export class DefTraverser extends ATraverser {
+export class ExDefTraverser extends AExTraverser {
   constructor(
     protected readonly isPrivate: boolean,
     validator: Validator,
-    traverser?: Traverser
+    traverser?: ExTraverser
   ) {
     super(validator, traverser);
   }

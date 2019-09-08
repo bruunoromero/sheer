@@ -1,8 +1,8 @@
-import { ATraverser } from "./atraverser";
+import { AExTraverser } from "./atraverser";
 import { ExVectorNode } from "../ast/primitives";
 import { ParserVector } from "../../parser/ast";
 
-export class VectorTraverser extends ATraverser {
+export class ExVectorTraverser extends AExTraverser {
   traverse(node: ParserVector): ExVectorNode {
     const mValue = node.value.map(el => this.traverser.traverseAndValidate(el));
 

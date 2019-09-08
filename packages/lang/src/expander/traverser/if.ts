@@ -1,8 +1,8 @@
-import { ATraverser } from "./atraverser";
+import { AExTraverser } from "./atraverser";
 import { ParserList } from "../../parser/ast";
 import { ExIfNode } from "../ast/if";
 
-export class IfTraverser extends ATraverser {
+export class ExIfTraverser extends AExTraverser {
   get fnName(): string {
     return "if";
   }

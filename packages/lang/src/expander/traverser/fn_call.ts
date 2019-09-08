@@ -1,10 +1,10 @@
-import { ATraverser } from "./atraverser";
+import { AExTraverser } from "./atraverser";
 import { ParserList } from "../../parser/ast";
 
 import { ExNode } from "../ast/node";
 import { ExFnCallNode } from "../ast/fn_call";
 
-export class FnCallTraverser extends ATraverser {
+export class ExFnCallTraverser extends AExTraverser {
   traverse(node: ParserList): ExNode {
     const callee = this.traverser.traverseAndValidate(node.value[0]);
 

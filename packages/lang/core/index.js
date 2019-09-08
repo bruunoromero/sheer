@@ -44,6 +44,10 @@ module.exports.not = curry(v => {
 
 // Interop
 
+module.exports.fromGlobal = curry(name => {
+  return global[name];
+});
+
 module.exports.instaciate = curry((Cls, args) => {
   return new (Cls.bind.apply(Cls, args))();
 });

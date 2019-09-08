@@ -1,14 +1,14 @@
 import { Location, ParserConcreteNode, ParserList } from "../../parser/ast";
 import { ParserType } from "../../parser/types";
 import { Validator } from "../../validator";
-import { ExNode } from "../ast/node";
+import { ExNode, ExErrorNode } from "../ast/node";
 import * as errors from "../errors";
-import { Traverser } from "./index";
+import { ExTraverser } from "./index";
 
-export abstract class ATraverser {
+export abstract class AExTraverser {
   constructor(
     protected readonly validator: Validator,
-    protected readonly traverser?: Traverser
+    protected readonly traverser?: ExTraverser
   ) {}
 
   abstract traverse(node: ParserConcreteNode): ExNode;
@@ -21,8 +21,11 @@ export abstract class ATraverser {
   }
 
   traverseAndValidate(node: ParserConcreteNode): ExNode {
-    this.validate(node);
-    return this.traverse(node);
+    if (this.validate(node)) {
+      return this.traverse(node);
+    }
+
+    return new ExErrorNode();
   }
 
   transformWithLoc(loc: Location, nodes: ParserConcreteNode[]): ExNode {
@@ -46,7 +49,7 @@ export abstract class ATraverser {
           return false;
         }
       })
-      .some(el => el === false);
+      .every(el => el === true);
   }
 
   invalidTypeProvided(arg: ParserConcreteNode, type: ParserType) {

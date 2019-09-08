@@ -1,10 +1,10 @@
-import { ATraverser } from "./atraverser";
+import { AExTraverser } from "./atraverser";
 import { ParserList } from "../../parser/ast";
 import { ExNamespaceNode } from "../ast/namespace";
 import * as utils from "../../utils";
 import { ExSymbolNode, ExVectorNode, ExKeywordNode } from "../ast/primitives";
 
-export class NamespaceTraverser extends ATraverser {
+export class ExNamespaceTraverser extends AExTraverser {
   get fnName() {
     return "ns";
   }

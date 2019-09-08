@@ -4,7 +4,7 @@
   "main": "dist/index.js",
   "license": "MIT",
   "scripts": {
-    "build": "tsc",
+    "build": "tsc --watch",
     "dev:f": "node fugger/index.js",
     "dev": "ts-node src/index.ts",
     "test": "jest --coverage",

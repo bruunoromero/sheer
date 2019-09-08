@@ -1,11 +1,6 @@
 import {
-  ParserBool,
   ParserConcreteNode,
-  ParserKeyword,
   ParserList,
-  ParserNull,
-  ParserNumber,
-  ParserString,
   ParserSymbol,
   ParserVector
 } from "../../parser/ast";
@@ -16,14 +11,14 @@ import {
   ExKeywordNode,
   ExNullNode,
   ExNumberNode,
-  ExStringNode,
-  ExSymbolNode
+  ExStringNode
 } from "../ast/primitives";
-import { ATraverser } from "./atraverser";
-import { ListTraverser } from "./list";
-import { VectorTraverser } from "./vector";
+import { AExTraverser } from "./atraverser";
+import { ExListTraverser } from "./list";
+import { ExSymbolTraverser } from "./symbol";
+import { ExVectorTraverser } from "./vector";
 
-export class Traverser extends ATraverser {
+export class ExTraverser extends AExTraverser {
   traverse(node: ParserConcreteNode): ExNode {
     switch (node.type) {
       case ParserType.NULL:
@@ -37,13 +32,15 @@ export class Traverser extends ATraverser {
       case ParserType.KEYWORD:
         return new ExKeywordNode(node.loc, node.value as string);
       case ParserType.SYMBOL:
-        return new ExSymbolNode(node.loc, node.value as string);
+        return new ExSymbolTraverser(this.validator, this).traverseAndValidate(
+          node as ParserSymbol
+        );
       case ParserType.LIST:
-        return new ListTraverser(this.validator, this).traverseAndValidate(
+        return new ExListTraverser(this.validator, this).traverseAndValidate(
           node as ParserList
         );
       case ParserType.VECTOR:
-        return new VectorTraverser(this.validator, this).traverseAndValidate(
+        return new ExVectorTraverser(this.validator, this).traverseAndValidate(
           node as ParserVector
         );
     }

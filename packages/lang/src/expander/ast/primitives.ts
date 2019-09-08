@@ -1,15 +1,4 @@
-import {
-  ParserMap,
-  ParserList,
-  ParserNull,
-  ParserBool,
-  ParserVector,
-  ParserString,
-  ParserNumber,
-  ParserKeyword,
-  ParserConcreteNode,
-  Location
-} from "../../parser/ast";
+import { Location } from "../../parser/ast";
 
 import { ExNode } from "./node";
 import { ExType } from "../types";

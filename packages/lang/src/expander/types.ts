@@ -2,24 +2,21 @@ export enum ExType {
   NS = "NS",
   FN = "FN",
   IF = "IF",
-  SET = "SET",
-  MAP = "MAP",
-  NOT = "NOT",
+  SET = "SET", //*
+  MAP = "MAP", //*
   DEF = "DEF",
   NULL = "NULL",
   BOOL = "BOOL",
-  BIN_OP = "BIN_OP",
+  ERROR = "ERROR",
   LOG_OP = "LOG_OP",
   MEMBER = "MEMBER",
   NUMBER = "NUMBER",
   STRING = "STRING",
   SYMBOL = "SYMBOL",
   VECTOR = "VECTOR",
-  EXPORT = "EXPORT",
   IMPORT = "IMPORT",
   KEYWORD = "KEYWORD",
   REQUIRE = "REQUIRE",
-  DECLARE = "DECLARE",
   FN_CALL = "FN_CALL",
   NATIVE_CALL = "NATIVE_CALL"
 }
