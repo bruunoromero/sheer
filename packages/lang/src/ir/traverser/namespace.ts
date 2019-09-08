@@ -9,7 +9,8 @@ export class IrNamespaceTraverser extends AIrTraverser<ExNamespaceNode> {
   }
 
   validate(ctx: IrContext, node: ExNamespaceNode) {
-    // return false;
-    return true;
+    this.validator.addError(node.loc, `unexpected ns ${node.name.value}`);
+
+    return false;
   }
 }

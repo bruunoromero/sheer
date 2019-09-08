@@ -79,7 +79,10 @@ const resolveSymbol = (
     }
   }
 
-  validator.addError(node.loc, "could not find");
+  validator.addError(
+    node.loc,
+    `could not find ${node.type.toLocaleLowerCase()} ${node.value}`
+  );
   return node;
 };
 

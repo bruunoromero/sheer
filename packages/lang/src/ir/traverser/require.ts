@@ -22,10 +22,15 @@ export class IrRequireTraverser extends AIrTraverser<ExRequireNode> {
   }
 
   validate(ctx: IrContext, node: ExRequireNode): boolean {
-    // if (ctx.hasLocalRequirement(node.ns.value)) {
-    //   //TODO: Set error on validator
-    //   return false;
-    // }
+    if (ctx.hasLocalRequirement(node.ns.value)) {
+      this.validator.addError(
+        node.loc,
+        `namespace ${node.ns.value} already required`
+      );
+
+      return false;
+    }
+
     return true;
   }
 }

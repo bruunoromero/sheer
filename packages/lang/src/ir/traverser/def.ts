@@ -20,10 +20,21 @@ export class IrDefTraverser extends AIrTraverser<ExDefNode> {
   }
 
   validate(ctx: IrContext, node: ExDefNode): boolean {
-    // if (ctx.isRoot()) {
-    //   //TODO: Set error on validator
-    //   return false;
-    // }
+    if (!ctx.isRoot()) {
+      this.validator.addError(
+        node.name.loc,
+        `cannot define a symbol outside of the global scope`
+      );
+
+      return false;
+    }
+
+    if (ctx.hasLocalDefinition(node.name.value)) {
+      this.validator.addError(
+        node.name.loc,
+        `symbol ${node.name.value} already defined`
+      );
+    }
 
     return true;
   }

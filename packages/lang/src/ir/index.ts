@@ -34,6 +34,12 @@ export const transform = (file: ExFile) => {
     new IrTraverser(validator).traverseAndValidate(ctx, node)
   );
 
+  const errors = validator.errors;
+
+  if (errors) {
+    throw errors;
+  }
+
   const requireCore = new IrRequireNode(
     irProgram[0].loc,
     IrSymbolNode.fromIrNode(irProgram[0], "sheer.core"),

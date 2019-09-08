@@ -22,9 +22,14 @@ export class IrFnTraverser extends AIrTraverser<ExFnNode> {
   }
 
   validate(ctx: IrContext, node: ExFnNode): boolean {
-    // const names = node.params.map(param => param.value);
+    const names = node.params.map(param => param.value);
 
-    // return new Set(names).size !== names.length;
-    return true;
+    const hasDup = new Set(names).size !== names.length;
+
+    if (hasDup) {
+      this.validator.addError(node.loc, `duplicated parameter names`);
+    }
+
+    return !hasDup;
   }
 }

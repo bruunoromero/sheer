@@ -54,7 +54,7 @@ export class IrTraverser extends AIrTraverser<ExNode> {
         return new IrNullNode(node as ExNullNode).toExpression();
       case ExType.NUMBER:
         return new IrNumberNode(node as ExNumberNode).toExpression();
-      case ExType.SYMBOL: //
+      case ExType.SYMBOL:
         return new IrSymbolNode(node as ExSymbolNode).toExpression();
       case ExType.VECTOR:
         return new IrVectorTraverser(this.validator, this)
@@ -91,7 +91,7 @@ export class IrTraverser extends AIrTraverser<ExNode> {
         return new IrIfTraverser(this.validator, this)
           .traverseAndValidate(ctx, node as ExIfNode)
           .toExpression();
-      case ExType.LOG_OP: //
+      case ExType.LOG_OP:
         return new IrLogOpTraverser(this.validator, this)
           .traverseAndValidate(ctx, node as ExLogOpNode)
           .toExpression();
@@ -99,7 +99,7 @@ export class IrTraverser extends AIrTraverser<ExNode> {
         return new IrNativeCallTraverse(this.validator, this)
           .traverseAndValidate(ctx, node as ExNativeCallNode)
           .toExpression();
-      case ExType.MEMBER: //
+      case ExType.MEMBER:
         return new IrMemberTraverser(this.validator, this)
           .traverseAndValidate(ctx, node as ExMemberNode)
           .toExpression();

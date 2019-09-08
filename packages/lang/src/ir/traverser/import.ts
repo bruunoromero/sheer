@@ -18,10 +18,13 @@ export class IrImportTraverser extends AIrTraverser<ExImportNode> {
   }
 
   validate(ctx: IrContext, node: ExImportNode): boolean {
-    // if (ctx.hasLocalImport(node.path.value)) {
-    //   //TODO: Set error on validator
-    //   return false;
-    // }
+    if (ctx.hasLocalImport(node.path.value)) {
+      this.validator.addError(
+        node.loc,
+        `namespace ${node.path.value} already imported`
+      );
+      return false;
+    }
 
     return true;
   }
