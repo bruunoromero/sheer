@@ -1,4 +1,4 @@
-(ns main)  
+(ns main)
 
 (-> [1 2 3 4 5]
     (filter (fn [x] (not= x 3)))

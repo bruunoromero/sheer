@@ -10,7 +10,6 @@
   (.filter coll f))
 
 (defn reduce [f coll] 
-  
   (.reduce coll f))
 
 (defn reduce-init [f init coll]
@@ -37,6 +36,8 @@
 ;; Interop
 
 (def from-global lang.core/fromGlobal)
+
+(def throw lang.core/throw)
 
 (def r lang.core/r)
 (def type lang.core/type)

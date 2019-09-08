@@ -1,3 +1,5 @@
+import "source-map-support/register";
+
 import * as fs from "fs";
 import * as path from "path";
 import * as rimraf from "rimraf";
@@ -57,6 +59,10 @@ export const compile = () => {
       .forEach(([ns, file]) => {
         const filePath = utils.nameToPath(ns as string, config, true);
         loader.writeFile(filePath, (file as any).compiled.code);
+        loader.writeFile(
+          `${filePath}.map`,
+          JSON.stringify((file as any).compiled.map)
+        );
       });
   } catch (e) {
     console.log(e);

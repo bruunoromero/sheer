@@ -1,4 +1,10 @@
 // Utils
+require("source-map-support").install();
+
+const root =
+  (typeof self === "object" && self.self === self && self) ||
+  (typeof global === "object" && global.global === global && global) ||
+  this;
 
 const curry = f => {
   function currify() {
@@ -13,6 +19,10 @@ const curry = f => {
 };
 
 // Arithmetic Operations
+
+module.exports.throw = () => {
+  throw "err";
+};
 
 module.exports.add = curry((...els) => {
   return els.reduce((a, b) => a + b);
@@ -45,7 +55,7 @@ module.exports.not = curry(v => {
 // Interop
 
 module.exports.fromGlobal = curry(name => {
-  return global[name];
+  return root[name];
 });
 
 module.exports.instaciate = curry((Cls, args) => {

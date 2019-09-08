@@ -5,7 +5,17 @@ import * as utils from "../utils";
 import { IrDefNode } from "../ir/ast/def";
 import { IrSymbolNode } from "../ir/ast/primitives";
 
-export const statement = node => {
+const withLoc = fn => (node, ...others) => {
+  const n = fn(node, ...others);
+
+  if (n) {
+    n.loc = node.loc;
+  }
+
+  return n;
+};
+
+export const statement = withLoc(node => {
   if (
     node.type.toLowerCase().indexOf("expression") > -1 ||
     node.type.toLowerCase().indexOf("literal") > -1 ||
@@ -15,7 +25,7 @@ export const statement = node => {
   }
 
   return node;
-};
+});
 
 const returnLast = (curr, index, exprs) => {
   if (index === exprs.length - 1) {
@@ -36,19 +46,19 @@ const toRestIfNeeded = (node, params) => {
   return params;
 };
 
-export const number = node => {
+export const number = withLoc(node => {
   return babel.numericLiteral(node.value);
-};
+});
 
-export const bool = node => {
+export const bool = withLoc(node => {
   return babel.booleanLiteral(node.value);
-};
+});
 
-export const string = node => {
+export const string = withLoc(node => {
   return babel.stringLiteral(node.value);
-};
+});
 
-export const declare = (node, traverse) => {
+export const declare = withLoc((node, traverse) => {
   if (node.isGlobal) {
     return babel.assignmentExpression(
       "=",
@@ -63,16 +73,16 @@ export const declare = (node, traverse) => {
 
   //TODO: Do something when is not global
   return null;
-};
+});
 
-export const member = (node, traverse) => {
+export const member = withLoc((node, traverse) => {
   const member = traverse(node.prop);
   const callee = traverse(node.owner);
 
   return babel.memberExpression(callee, member, true);
-};
+});
 
-export const def = (node: IrDefNode, traverse) => {
+export const def = withLoc((node: IrDefNode, traverse) => {
   return babel.assignmentExpression(
     "=",
     babel.memberExpression(
@@ -82,45 +92,45 @@ export const def = (node: IrDefNode, traverse) => {
     ),
     traverse(node.value)
   );
-};
+});
 
-export const symbol = (node: IrSymbolNode) => {
+export const symbol = withLoc((node: IrSymbolNode) => {
   return babel.identifier(utils.normalizeName(node.value));
-};
+});
 
-export const if_ = (node, traverse) => {
+export const if_ = withLoc((node, traverse) => {
   return babel.conditionalExpression(
     traverse(node.cond),
     traverse(node.truthy),
     traverse(node.falsy)
   );
-};
+});
 
 export const null_ = () => {
   return babel.nullLiteral();
 };
 
-export const logOp = (node, traverse) => {
+export const logOp = withLoc((node, traverse) => {
   return babel.logicalExpression(
     node.op,
     traverse(node.left),
     traverse(node.right)
   );
-};
+});
 
-export const binOp = (node, traverse) => {
+export const binOp = withLoc((node, traverse) => {
   return babel.binaryExpression(
     node.op,
     traverse(node.left),
     traverse(node.right)
   );
-};
+});
 
-export const not = (node, traverse) => {
+export const not = withLoc((node, traverse) => {
   return babel.unaryExpression("!", traverse(node.value));
-};
+});
 
-export const fn = (node, traverse) => {
+export const fn = withLoc((node, traverse) => {
   const params = node.params.map(traverse);
   const expandedParams = toRestIfNeeded(node, params);
   return babel.callExpression(
@@ -141,13 +151,13 @@ export const fn = (node, traverse) => {
       )
     ]
   );
-};
+});
 
-export const fnCall = (node, traverse) => {
+export const fnCall = withLoc((node, traverse) => {
   return babel.callExpression(traverse(node.callee), node.args.map(traverse));
-};
+});
 
-export const require_ = (node, traverse, config) => {
+export const require_ = withLoc((node, traverse, config) => {
   const currentPath = utils.nameToPath(config.ns, config, true);
   const filePath = utils.nameToPath(node.ns.value, config, true);
   const resolvedPath = path.relative(currentPath, filePath).slice(1);
@@ -160,18 +170,18 @@ export const require_ = (node, traverse, config) => {
     [babel.importDefaultSpecifier(as || name)],
     babel.stringLiteral(resolvedPath)
   );
-};
+});
 
-export const nativeCall = (node, traverse) => {
+export const nativeCall = withLoc((node, traverse) => {
   const member = babel.memberExpression(
     traverse(node.callee),
     traverse(node.fn),
     true
   );
   return babel.callExpression(member, node.args.map(traverse));
-};
+});
 
-export const import_ = (node, traverse, config) => {
+export const import_ = withLoc((node, traverse, config) => {
   return babel.importDeclaration(
     [
       babel.importDefaultSpecifier(
@@ -180,8 +190,8 @@ export const import_ = (node, traverse, config) => {
     ],
     babel.stringLiteral(node.path.value)
   );
-};
+});
 
-export const vector = (node, traverse) => {
+export const vector = withLoc((node, traverse) => {
   return babel.arrayExpression(node.value.map(traverse));
-};
+});
