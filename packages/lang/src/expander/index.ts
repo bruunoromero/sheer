@@ -4,7 +4,8 @@ import { ExTraverser } from "./traverser";
 import { ExNode } from "./ast/node";
 import { ExType } from "./types";
 import { ExNamespaceNode } from "./ast/namespace";
-
+import * as utils from "../utils";
+import * as project from "../project";
 export class ExFile {
   constructor(
     public readonly path: string,
@@ -18,13 +19,23 @@ export const transform = (
   source: string,
   ast: ParserConcreteNode[]
 ): ExFile => {
-  const validator = new Validator(path, source);
+  const validator = new Validator(source, path);
   const traverser = new ExTraverser(validator);
 
   let irAst = ast.map(node => traverser.traverseAndValidate(node));
 
   if (irAst[0].type === ExType.NS) {
     const ns = irAst[0] as ExNamespaceNode;
+
+    if (utils.nameToPath(ns.name.value, project.config()) !== path) {
+      validator.addError(ns.name.loc, `namespace does not conform to file path`);
+    }
+
+    const errors = validator.errors;
+
+    if (errors) {
+      throw errors;
+    }
 
     irAst = [ns as ExNode]
       .concat(ns.buildImports())

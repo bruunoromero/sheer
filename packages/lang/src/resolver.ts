@@ -55,7 +55,7 @@ const resolveSymbol = (
 
       const fileExports = deps[name].ctx.collectExports();
 
-      for (let [expName, expNode] of fileExports) {
+      for (let [expName] of fileExports) {
         if (expName === node.value) {
           return new IrMemberNode(
             node.loc,

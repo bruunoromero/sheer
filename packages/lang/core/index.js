@@ -92,4 +92,12 @@ module.exports.type = curry(v => {
   return typeof v;
 });
 
+module.exports.apply = curry((fn, args) => {
+  return fn(...args);
+});
+
+module.exports.get = curry((coll, k) => {
+  return coll[k];
+});
+
 module.exports.curry = curry;

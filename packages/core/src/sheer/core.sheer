@@ -1,55 +1,19 @@
 (ns sheer.core
   :import [["@sheer/lang/core" :as lang.core]])
 
-;; Collections Operations
-
-(defn map [f coll]
-  (.map coll f))
-
-(defn filter [f coll] 
-  (.filter coll f))
-
-(defn reduce [f coll] 
-  (.reduce coll f))
-
-(defn reduce-init [f init coll]
-  (.reduce coll f init))
-
-(defn each [f coll]
-  (.forEach coll f))
-
-(defn join [d coll]
-  (.join coll d))
-
-;; Utils
-
-(def curry lang.core/curry)
-
-(defn -> [x & fns]
-  (reduce-init (fn [v f] (f v)) x fns))
-
-;; Strings
-
-(defn split [d s]
-  (.split s d))
-
 ;; Interop
 
-(def from-global lang.core/fromGlobal)
-
-(def throw lang.core/throw)
-
 (def r lang.core/r)
+(def get lang.core/get)
 (def type lang.core/type)
 (def raise lang.core/raise)
+(def apply lang.core/apply)
 (def try lang.core/tryCatch)
-(def log! (curry (:log (from-global :console))))
+(def discard lang.core/discard)
+(def from-global lang.core/fromGlobal)
 
 (defn new [c & args]
   (lang.core/instaciate c args))
-
-(def discard lang.core/discard)
-
 
 ;; Arithmetic Operations
 
@@ -82,6 +46,48 @@
 
 (defn instance? [c v]
   (lang.core/isInstance c v))
+
+;; Collections Operations
+
+(defn map [f coll]
+  (.map coll f))
+
+(defn filter [f coll] 
+  (.filter coll f))
+
+(defn reduce [f coll] 
+  (.reduce coll f))
+
+(defn reduce-init [f init coll]
+  (.reduce coll f init))
+
+(defn each [f coll]
+  (.forEach coll f))
+
+(defn join [d coll]
+  (.join coll d))
+
+;; Utils
+
+(def curry lang.core/curry)
+
+(defn -> [x & fns]
+  (reduce-init
+    (fn [v f] 
+      (if (keyword? f)
+        (get v f)
+        (f v)))
+    x fns))
+
+(def log! (-> :console
+              from-global
+              :log
+              curry))
+
+;; Strings
+
+(defn split [d s]
+  (.split s d))
 
 ;; Cast
 

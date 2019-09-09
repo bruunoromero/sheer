@@ -16,16 +16,12 @@ const ensureDirectoryExistence = (filePath: string) => {
 };
 
 export const loadFile = (path: string): ir.IrFile => {
-  try {
-    const source = fs.readFileSync(path, "utf8");
-    const program = parser.transform(source);
+  const source = fs.readFileSync(path, "utf8");
+  const program = parser.transform(source);
 
-    const file = expander.transform(path, source, program);
+  const file = expander.transform(path, source, program);
 
-    return ir.transform(file);
-  } catch (e) {
-    console.log(e);
-  }
+  return ir.transform(file);
 };
 
 export const writeFile = (path: string, source: string) => {

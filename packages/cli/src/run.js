@@ -4,8 +4,13 @@ const { fork } = require("child_process")
 const project = require("@sheer/lang/dist/project")
 
 module.exports = () => {
+  console.time("Done")
   compiler.compile()
   const config = project.config()
+  const command = fork(config.entryCompiled)
 
-  fork(config.entryCompiled)
+  command.on("exit", function(code) {
+    console.log("")
+    console.timeEnd("Done")
+  })
 }
