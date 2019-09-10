@@ -4,6 +4,7 @@ import * as babel from "@babel/types";
 import * as utils from "../utils";
 import { IrDefNode } from "../ir/ast/def";
 import { IrSymbolNode } from "../ir/ast/primitives";
+import { IrMapNode } from "../ir/ast/map";
 
 const withLoc = fn => (node, ...others) => {
   const n = fn(node, ...others);
@@ -194,4 +195,12 @@ export const import_ = withLoc((node, traverse, config) => {
 
 export const vector = withLoc((node, traverse) => {
   return babel.arrayExpression(node.value.map(traverse));
+});
+
+export const map = withLoc((node: IrMapNode, traverse) => {
+  return babel.objectExpression(
+    node.value.map(([key, value]) =>
+      babel.objectProperty(traverse(key), traverse(value), true)
+    )
+  );
 });

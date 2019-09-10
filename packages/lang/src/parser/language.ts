@@ -12,7 +12,7 @@ export const language = P.createLanguage({
       r.Symbol,
       r.List,
       r.Vector,
-      r.Set,
+      // r.Set,
       r.Map
     );
   },
@@ -25,12 +25,14 @@ export const language = P.createLanguage({
     return P.regexp(
       /[a-zA-Z_\-\+=\.></\\\?\*\|$&!][a-zA-Z_\-\+=\.></\\\?\*\|$&!0-9]*/
     )
+      .desc("a symbol")
       .mark()
       .map(t.symbol);
   },
 
   Keyword: r => {
     return P.seqObj<any>(P.string(":"), ["symbol", r.Symbol])
+      .desc("a keyword")
       .mark()
       .map(({ start, end, value }) => ({
         start,
@@ -42,28 +44,33 @@ export const language = P.createLanguage({
 
   Number: () => {
     return P.regexp(/-?(0|[1-9][0-9]*)([.][0-9]+)?([eE][+-]?[0-9]+)?/)
+      .desc("a number")
       .mark()
       .map(t.numberLiteral);
   },
 
   String: () => {
     return P.regexp(/"((?:\\.|.)*?)"/, 1)
+      .desc("a string")
       .mark()
       .map(t.stringLiteral);
   },
 
   Null: () =>
     P.string("null")
+      .desc("a null")
       .mark()
       .map(t.nullLiteral),
 
   Bool: () =>
     P.alt(P.string("true"), P.string("false"))
+      .desc("a bool")
       .mark()
       .map(t.boolLiteral),
 
   List: r => {
     return r.Expression.trim(r._)
+      .desc("a list")
       .many()
       .wrap(P.string("("), P.string(")"))
       .mark()
@@ -72,6 +79,7 @@ export const language = P.createLanguage({
 
   Vector: r => {
     return r.Expression.trim(r._)
+      .desc("a vector")
       .many()
       .wrap(P.string("["), P.string("]"))
       .mark()
@@ -80,6 +88,7 @@ export const language = P.createLanguage({
 
   Map: r => {
     return r.Expression.trim(r._)
+      .desc("a map")
       .many()
       .wrap(P.string("{"), P.string("}"))
       .mark()

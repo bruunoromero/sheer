@@ -79,10 +79,7 @@
         (f v)))
     x fns))
 
-(def log! (-> :console
-              from-global
-              :log
-              curry))
+(def log! (-> :console from-global :log))
 
 ;; Strings
 

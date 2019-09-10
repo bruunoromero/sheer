@@ -59,6 +59,8 @@ const traverse = (node, config) => {
       return transformer.member(node, traverse);
     case IrType.VECTOR:
       return transformer.vector(node, traverse);
+    case IrType.MAP:
+      return transformer.map(node, traverse);
     case IrType.FN_CALL:
       return transformer.fnCall(node, traverse);
     case IrType.REQUIRE:

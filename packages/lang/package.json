@@ -20,10 +20,12 @@
     "colors": "^1.3.3",
     "cosmiconfig": "^5.2.1",
     "escape-string-regexp": "^2.0.0",
+    "moment": "^2.24.0",
     "parsimmon": "^1.13.0",
     "ramda": "^0.26.1",
     "rimraf": "^3.0.0",
-    "source-map-support": "^0.5.13"
+    "source-map-support": "^0.5.13",
+    "toposort": "^2.0.2"
   },
   "devDependencies": {
     "@types/babel-code-frame": "^6.20.2",
@@ -31,6 +33,7 @@
     "@types/node": "^12.7.3",
     "@types/parsimmon": "^1.10.0",
     "@types/ramda": "^0.26.21",
+    "@types/toposort": "^2.0.3",
     "eslint": "^6.2.1",
     "eslint-config-prettier": "^6.1.0",
     "jest": "^24.8.0",

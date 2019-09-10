@@ -1,0 +1,9 @@
+{
+  "createdAt": "2019-09-10T01:08:46-03:00",
+  "ns": "main",
+  "path": "/Users/bruno.barreira/git-repo/sheer/packages/core/src/main.sheer",
+  "exports": [],
+  "requires": [
+    "sheer.core"
+  ]
+}

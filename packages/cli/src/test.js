@@ -3,8 +3,7 @@ const { runCLI } = require("@jest/core")
 const project = require("@sheer/lang/dist/project")
 
 module.exports = async () => {
-  compiler.compile()
-  const config = project.config()
+  const config = compiler.compile()
   const jestConfig = {
     testRegex: `${config.outSource}/${config.tests}/.*.js$`
   }

@@ -1,6 +1,7 @@
 export enum IrType {
   FN = "FN",
   IF = "IF",
+  MAP = "MAP",
   DEF = "DEF",
   BOOL = "BOOL",
   NULL = "NULL",

@@ -8,6 +8,7 @@ export const GLOBALS = "__$$GLOBALS$$__";
 export const CORE = "__$$SHEER_LANG_CORE$$__";
 
 export const MODULES_FOLDER = `${EXT}_stuff`;
+export const META_FOLDER = `.${EXT}_meta`;
 
 const fsName = name => name.split(".").join(path.sep);
 
@@ -49,6 +50,12 @@ export const pathToName = (
     .replace(sourceFolder(config, isOut) + path.sep, "")
     .split(path.sep)
     .join(".");
+};
+
+export const nameToMetaPath = (name: string, config: SheerConfig) => {
+  const fileName = path.resolve(config.metaSource, fsName(name));
+
+  return `${fileName}.json`;
 };
 
 export const nameToPath = (

@@ -19,5 +19,5 @@ export const compile = (file: IrFile, ns: string, config: SheerConfig) => {
     } as any
   );
 
-  return { file, compiled: generated };
+  return generated;
 };

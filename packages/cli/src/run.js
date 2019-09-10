@@ -5,8 +5,7 @@ const project = require("@sheer/lang/dist/project")
 
 module.exports = () => {
   console.time("Done")
-  compiler.compile()
-  const config = project.config()
+  const config = compiler.compile()
   const command = fork(config.entryCompiled)
 
   command.on("exit", function(code) {

@@ -8,14 +8,12 @@ import { IrType } from "./types";
 export class IrContext {
   _ns: ExNamespaceNode;
   _parent?: IrContext;
-  _childs: IrContext[];
   _imports: { [name: string]: IrImportNode };
   _requires: { [name: string]: IrRequireNode };
   _definitions: { [name: string]: IrDefNode | IrSymbolNode };
 
   constructor(parent?: IrContext, ns?: ExNamespaceNode) {
     this._ns = ns;
-    this._childs = [];
     this._imports = {};
     this._requires = {};
     this._parent = parent;
@@ -39,9 +37,9 @@ export class IrContext {
   }
 
   collectDependencies(): [string, IrRequireNode | IrImportNode][] {
-    return Object.entries(this.requires).concat(Object.entries(
-      this.imports
-    ) as any);
+    return Object.entries(this.requires)
+      .filter(([name]) => this._ns && this._ns.name.value !== name)
+      .concat(Object.entries(this.imports) as any);
   }
 
   get requires(): { [name: string]: IrRequireNode } {
@@ -106,7 +104,7 @@ export class IrContext {
 
   extend() {
     const ctx = new IrContext(this);
-    this._childs.push(ctx);
+
     return ctx;
   }
 }

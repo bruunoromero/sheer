@@ -1,5 +1,4 @@
-import { Dependency } from "./dependency";
-import { IrFile } from "./ir";
+import { IrFile, IrMeta } from "./ir";
 import { IrType } from "./ir/types";
 import { IrSymbolNode, IrStringNode } from "./ir/ast/primitives";
 import { IrDefNode } from "./ir/ast/def";
@@ -16,14 +15,13 @@ import { IrFnCallNode } from "./ir/ast/fn_call";
 import { IrNativeCallNode } from "./ir/ast/native_call";
 import { IrLogOpNode } from "./ir/ast/log_op";
 import { Validator } from "./validator";
-
-type DependencyMap = { [name: string]: IrFile };
+import { IrMapNode } from "./ir/ast/map";
 
 const resolveSymbol = (
   node: IrSymbolNode,
   validator: Validator,
   ctx: IrContext,
-  deps: DependencyMap
+  metas: IrMeta[]
 ): IrMemberNode | IrSymbolNode => {
   const [foundCtx] = ctx.findDefinition(node.value);
   if (foundCtx) {
@@ -53,9 +51,8 @@ const resolveSymbol = (
         // TODO: Error
       }
 
-      const fileExports = deps[name].ctx.collectExports();
-
-      for (let [expName] of fileExports) {
+      const fileExports = metas.find(meta => meta.ns === name).exports;
+      for (let expName of fileExports) {
         if (expName === node.value) {
           return new IrMemberNode(
             node.loc,
@@ -90,7 +87,7 @@ const resolveMember = (
   node: IrMemberNode,
   validator: Validator,
   ctx: IrContext,
-  deps: DependencyMap
+  metas: IrMeta[]
 ) => {
   const owner = node.owner.value;
   const prop = (node.prop as IrExpressionNode).value;
@@ -131,7 +128,7 @@ const resolveMember = (
 
   return new IrMemberNode(
     node.loc,
-    resolveExpression(node.owner, validator, ctx, deps),
+    resolveExpression(node.owner, validator, ctx, metas),
     IrStringNode.fromIrNode(prop, (prop as any).value)
   );
 };
@@ -140,12 +137,12 @@ const resolveDef = (
   node: IrDefNode,
   validator: Validator,
   ctx: IrContext,
-  deps: DependencyMap
+  metas: IrMeta[]
 ) => {
   return new IrDefNode(
     node.loc,
     node.name,
-    resolveExpression(node.value, validator, ctx, deps),
+    resolveExpression(node.value, validator, ctx, metas),
     node.isPrivate
   );
 };
@@ -154,12 +151,12 @@ const resolveFn = (
   node: IrFnNode,
   validator: Validator,
   ctx: IrContext,
-  deps: DependencyMap
+  metas: IrMeta[]
 ) => {
   return new IrFnNode(
     node.loc,
     node.body.map(bNode =>
-      resolveExpression(bNode as IrExpressionNode, validator, node.ctx, deps)
+      resolveExpression(bNode as IrExpressionNode, validator, node.ctx, metas)
     ),
     node.params,
     node.isRest,
@@ -171,13 +168,13 @@ const resolveIf = (
   node: IrIfNode,
   validator: Validator,
   ctx: IrContext,
-  deps: DependencyMap
+  metas: IrMeta[]
 ) => {
   return new IrIfNode(
     node.loc,
-    resolveExpression(node.cond, validator, ctx, deps),
-    resolveExpression(node.truthy, validator, ctx, deps),
-    resolveExpression(node.falsy, validator, ctx, deps)
+    resolveExpression(node.cond, validator, ctx, metas),
+    resolveExpression(node.truthy, validator, ctx, metas),
+    resolveExpression(node.falsy, validator, ctx, metas)
   );
 };
 
@@ -185,11 +182,26 @@ const resolveVector = (
   node: IrVectorNode,
   validator: Validator,
   ctx: IrContext,
-  deps: DependencyMap
+  metas: IrMeta[]
 ) => {
   return new IrVectorNode(
     node.loc,
-    node.value.map(node => resolveExpression(node, validator, ctx, deps))
+    node.value.map(node => resolveExpression(node, validator, ctx, metas))
+  );
+};
+
+const resolveMap = (
+  node: IrMapNode,
+  validator: Validator,
+  ctx: IrContext,
+  metas: IrMeta[]
+) => {
+  return new IrMapNode(
+    node.loc,
+    node.value.map(([key, value]) => [
+      resolveExpression(key, validator, ctx, metas),
+      resolveExpression(value, validator, ctx, metas)
+    ])
   );
 };
 
@@ -197,12 +209,12 @@ const resolveFnCall = (
   node: IrFnCallNode,
   validator: Validator,
   ctx: IrContext,
-  deps: DependencyMap
+  metas: IrMeta[]
 ) => {
   return new IrFnCallNode(
     node.loc,
-    resolveExpression(node.callee, validator, ctx, deps),
-    node.args.map(node => resolveExpression(node, validator, ctx, deps))
+    resolveExpression(node.callee, validator, ctx, metas),
+    node.args.map(node => resolveExpression(node, validator, ctx, metas))
   );
 };
 
@@ -210,13 +222,13 @@ const resolveNativeCall = (
   node: IrNativeCallNode,
   validator: Validator,
   ctx: IrContext,
-  deps: DependencyMap
+  metas: IrMeta[]
 ) => {
   return new IrNativeCallNode(
     node.loc,
-    resolveExpression(node.callee, validator, ctx, deps),
+    resolveExpression(node.callee, validator, ctx, metas),
     IrStringNode.fromIrNode(node, node.fn.value),
-    node.args.map(node => resolveExpression(node, validator, ctx, deps))
+    node.args.map(node => resolveExpression(node, validator, ctx, metas))
   );
 };
 
@@ -224,12 +236,12 @@ const resolveLogOp = (
   node: IrLogOpNode,
   validator: Validator,
   ctx: IrContext,
-  deps: DependencyMap
+  metas: IrMeta[]
 ) => {
   return new IrLogOpNode(
     node.loc,
-    resolveExpression(node.left, validator, ctx, deps),
-    resolveExpression(node.right, validator, ctx, deps),
+    resolveExpression(node.left, validator, ctx, metas),
+    resolveExpression(node.right, validator, ctx, metas),
     node.op
   );
 };
@@ -239,15 +251,15 @@ const wrapExpression = (
     node: IrNode,
     validator: Validator,
     ctx: IrContext,
-    deps: DependencyMap
+    metas: IrMeta[]
   ) => IrNode
 ) => (
   node: IrNode,
   validator: Validator,
   ctx: IrContext,
-  deps: DependencyMap
+  metas: IrMeta[]
 ): IrExpressionNode => {
-  return fn(node, validator, ctx, deps).toExpression();
+  return fn(node, validator, ctx, metas).toExpression();
 };
 
 const resolveExpression = wrapExpression(
@@ -255,7 +267,7 @@ const resolveExpression = wrapExpression(
     node: IrExpressionNode,
     validator: Validator,
     ctx: IrContext,
-    deps: DependencyMap
+    metas: IrMeta[]
   ) => {
     switch (node.value.type) {
       case IrType.NULL:
@@ -264,44 +276,42 @@ const resolveExpression = wrapExpression(
       case IrType.NUMBER:
         return node.value;
       case IrType.DEF:
-        return resolveDef(node.value as IrDefNode, validator, ctx, deps);
+        return resolveDef(node.value as IrDefNode, validator, ctx, metas);
       case IrType.FN:
-        return resolveFn(node.value as IrFnNode, validator, ctx, deps);
+        return resolveFn(node.value as IrFnNode, validator, ctx, metas);
       case IrType.IF:
-        return resolveIf(node.value as IrIfNode, validator, ctx, deps);
+        return resolveIf(node.value as IrIfNode, validator, ctx, metas);
       case IrType.VECTOR:
-        return resolveVector(node.value as IrVectorNode, validator, ctx, deps);
+        return resolveVector(node.value as IrVectorNode, validator, ctx, metas);
+      case IrType.MAP:
+        return resolveMap(node.value as IrMapNode, validator, ctx, metas);
       case IrType.FN_CALL:
-        return resolveFnCall(node.value as IrFnCallNode, validator, ctx, deps);
+        return resolveFnCall(node.value as IrFnCallNode, validator, ctx, metas);
       case IrType.NATIVE_CALL:
         return resolveNativeCall(
           node.value as IrNativeCallNode,
           validator,
           ctx,
-          deps
+          metas
         );
       case IrType.LOG_OP:
-        return resolveLogOp(node.value as IrLogOpNode, validator, ctx, deps);
+        return resolveLogOp(node.value as IrLogOpNode, validator, ctx, metas);
       case IrType.SYMBOL:
-        return resolveSymbol(node.value as IrSymbolNode, validator, ctx, deps);
+        return resolveSymbol(node.value as IrSymbolNode, validator, ctx, metas);
       case IrType.MEMBER:
-        return resolveMember(node.value as IrMemberNode, validator, ctx, deps);
+        return resolveMember(node.value as IrMemberNode, validator, ctx, metas);
     }
   }
 );
 
-const resolveFile = (
-  file: IrFile,
-  validator: Validator,
-  deps: DependencyMap
-) => {
+const resolveFile = (file: IrFile, validator: Validator, metas: IrMeta[]) => {
   return file.program.map(node => {
     if (node.type === IrType.EXPRESSION) {
       return resolveExpression(
         node as IrExpressionNode,
         validator,
         file.ctx,
-        deps
+        metas
       );
     }
 
@@ -309,41 +319,21 @@ const resolveFile = (
   });
 };
 
-const getDependencies = (file: IrFile, deps: Dependency): DependencyMap => {
-  return file.ctx
-    .collectDependencies()
-    .filter(([_, el]) => el.type === IrType.REQUIRE)
-    .map(([name]) => [name, deps.files(name)])
-    .reduce((acc, [name, dep]) => {
-      acc[name as string] = dep;
-      return acc;
-    }, {});
-};
+export const transform = (file: IrFile, metas: IrMeta[]): IrFile => {
+  const validator = new Validator(file.source, file.path);
+  const resolvedFile = new IrFile(
+    file.ns,
+    file.path,
+    file.source,
+    resolveFile(file, validator, metas),
+    file.ctx
+  );
 
-export const transform = (deps: Dependency) => {
-  const files: [string, Validator, IrFile][] = (deps.files() as [
-    string,
-    IrFile
-  ][]).map(([name, file]) => {
-    const validator = new Validator(file.source, file.path);
-    return [
-      name,
-      validator,
-      new IrFile(
-        file.ns,
-        file.path,
-        file.source,
-        resolveFile(file, validator, getDependencies(file, deps)),
-        file.ctx
-      )
-    ];
-  });
-
-  const errors = files.map(([_, validator]) => validator.errors).join("");
+  const errors = validator.errors;
 
   if (errors) {
     throw errors;
   }
 
-  return files.map(([name, _, file]) => [name, file]);
+  return resolvedFile;
 };

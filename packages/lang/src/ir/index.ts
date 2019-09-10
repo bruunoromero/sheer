@@ -1,3 +1,4 @@
+import * as moment from "moment";
 import * as utils from "../utils";
 import * as project from "../project";
 import { ExFile } from "../expander";
@@ -9,6 +10,17 @@ import { Validator } from "../validator";
 import { IrNode } from "./ast/node";
 import { IrRequireNode } from "./ast/require";
 import { IrSymbolNode, IrStringNode } from "./ast/primitives";
+import { IrType } from "./types";
+
+export class IrMeta {
+  constructor(
+    public readonly createdAt: string,
+    public readonly ns: string,
+    public readonly path: string,
+    public readonly exports: string[],
+    public readonly requires: string[]
+  ) {}
+}
 
 export class IrFile {
   constructor(
@@ -18,9 +30,31 @@ export class IrFile {
     public readonly program: IrNode[],
     public readonly ctx: IrContext
   ) {}
+
+  dependencies() {
+    return this.ctx.collectDependencies();
+  }
+
+  requires() {
+    return this.dependencies().filter(([_, el]) => el.type === IrType.REQUIRE);
+  }
+
+  exports() {
+    return this.ctx.collectExports();
+  }
+
+  meta() {
+    return new IrMeta(
+      moment().format(),
+      this.ns,
+      this.path,
+      this.exports().map(([name]) => name),
+      this.requires().map(([name]) => name)
+    );
+  }
 }
 
-export const transform = (file: ExFile) => {
+export const transform = (file: ExFile, config: project.SheerConfig) => {
   const ns: ExNamespaceNode | null =
     file.program[0].type === ExType.NS
       ? (file.program[0] as ExNamespaceNode)
@@ -49,9 +83,7 @@ export const transform = (file: ExFile) => {
 
   const programWithCore = [requireCore].concat(irProgram as any[]);
 
-  const nsName = ns
-    ? ns.name.value
-    : utils.pathToName(file.path, project.config());
+  const nsName = ns ? ns.name.value : utils.pathToName(file.path, config);
 
   ctx.addLocalRequirement("sheer.core", requireCore);
   return new IrFile(nsName, file.path, file.source, programWithCore, ctx);

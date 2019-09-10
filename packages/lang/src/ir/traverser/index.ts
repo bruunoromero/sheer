@@ -9,7 +9,8 @@ import {
   ExStringNode,
   ExSymbolNode,
   ExKeywordNode,
-  ExVectorNode
+  ExVectorNode,
+  ExMapNode
 } from "../../expander/ast/primitives";
 import { ExRequireNode } from "../../expander/ast/require";
 import { ExType } from "../../expander/types";
@@ -39,6 +40,7 @@ import { IrNativeCallTraverse } from "./native_call";
 import { ExNativeCallNode } from "../../expander/ast/native_call";
 import { ExMemberNode } from "../../expander/ast/member";
 import { IrMemberTraverser } from "./member";
+import { IrMapTraverser } from "./map";
 
 export class IrTraverser extends AIrTraverser<ExNode> {
   traverse(ctx: IrContext, node: ExNode) {
@@ -59,6 +61,10 @@ export class IrTraverser extends AIrTraverser<ExNode> {
       case ExType.VECTOR:
         return new IrVectorTraverser(this.validator, this)
           .traverseAndValidate(ctx, node as ExVectorNode)
+          .toExpression();
+      case ExType.MAP:
+        return new IrMapTraverser(this.validator, this)
+          .traverseAndValidate(ctx, node as ExMapNode)
           .toExpression();
       case ExType.NS:
         return new IrNamespaceTraverser(

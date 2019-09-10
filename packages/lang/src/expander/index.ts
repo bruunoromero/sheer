@@ -17,7 +17,8 @@ export class ExFile {
 export const transform = (
   path: string,
   source: string,
-  ast: ParserConcreteNode[]
+  ast: ParserConcreteNode[],
+  config: project.SheerConfig
 ): ExFile => {
   const validator = new Validator(source, path);
   const traverser = new ExTraverser(validator);
@@ -27,8 +28,11 @@ export const transform = (
   if (irAst[0].type === ExType.NS) {
     const ns = irAst[0] as ExNamespaceNode;
 
-    if (utils.nameToPath(ns.name.value, project.config()) !== path) {
-      validator.addError(ns.name.loc, `namespace does not conform to file path`);
+    if (utils.nameToPath(ns.name.value, config) !== path) {
+      validator.addError(
+        ns.name.loc,
+        `namespace does not conform to file path`
+      );
     }
 
     const errors = validator.errors;

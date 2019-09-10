@@ -1,4 +1,3 @@
-import * as fs from "fs";
 import * as R from "ramda";
 import * as path from "path";
 import * as cosmiconfig from "cosmiconfig";
@@ -8,6 +7,7 @@ import * as utils from "./utils";
 export interface SheerConfig {
   tests: string;
   outSource: string;
+  metaSource: string;
   rootSource: string;
   projectRoot: string;
   rootModules: string;
@@ -53,11 +53,13 @@ const buildConfig = ({ filepath, config, isEmpty }: RcConfig): SheerConfig => {
 
   const outSource = path.join(projectRoot, merdedConfig.out);
   const rootSource = path.join(projectRoot, merdedConfig.src);
+  const metaSource = path.join(projectRoot, utils.META_FOLDER);
   const rootModules = path.join(projectRoot, utils.MODULES_FOLDER);
 
   return {
     outSource,
     rootSource,
+    metaSource,
     projectRoot,
     rootModules,
     tests: merdedConfig.tests,
@@ -69,17 +71,15 @@ const buildConfig = ({ filepath, config, isEmpty }: RcConfig): SheerConfig => {
   };
 };
 
-export const loadConfig = () => {
-  if (_config) return _config;
-
+export const loadProject = () => {
   const result = searchConfig();
 
   if (!result) {
     throw "Could not load configuration file";
   }
 
-  _config = buildConfig(result);
-  return _config;
+  const config = buildConfig(result);
+  return new Project(config);
 };
 
 const mainPath = (
@@ -90,6 +90,6 @@ const mainPath = (
   return utils.nameToPath(main, config, isOut);
 };
 
-export const config = () => {
-  return _config;
-};
+export class Project {
+  constructor(public readonly config: SheerConfig) {}
+}

@@ -14,4 +14,13 @@ export class IrFnNode extends IrNode {
   ) {
     super(loc, IrType.FN);
   }
+
+  toJSON() {
+    return {
+      loc: this.loc,
+      body: this.body,
+      params: this.params,
+      isRest: this.isRest
+    };
+  }
 }

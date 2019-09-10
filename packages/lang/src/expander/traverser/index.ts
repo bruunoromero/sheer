@@ -2,7 +2,8 @@ import {
   ParserConcreteNode,
   ParserList,
   ParserSymbol,
-  ParserVector
+  ParserVector,
+  ParserMap
 } from "../../parser/ast";
 import { ParserType } from "../../parser/types";
 import { ExNode } from "../ast/node";
@@ -17,6 +18,7 @@ import { AExTraverser } from "./atraverser";
 import { ExListTraverser } from "./list";
 import { ExSymbolTraverser } from "./symbol";
 import { ExVectorTraverser } from "./vector";
+import { ExMapTraverser } from "./map";
 
 export class ExTraverser extends AExTraverser {
   traverse(node: ParserConcreteNode): ExNode {
@@ -42,6 +44,10 @@ export class ExTraverser extends AExTraverser {
       case ParserType.VECTOR:
         return new ExVectorTraverser(this.validator, this).traverseAndValidate(
           node as ParserVector
+        );
+      case ParserType.MAP:
+        return new ExMapTraverser(this.validator, this).traverseAndValidate(
+          node as ParserMap
         );
     }
 
