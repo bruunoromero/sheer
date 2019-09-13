@@ -19,7 +19,7 @@ export const language = P.createLanguage({
 
   NotNewline: () => P.regexp(/[^\n]*/),
   _: r => r.Comment.sepBy(P.optWhitespace).trim(P.optWhitespace),
-  Comment: r => r.NotNewline.wrap(P.string(";"), P.string("\n")),
+  Comment: r => r.NotNewline.wrap(P.string(";"), P.end),
 
   Symbol: () => {
     return P.regexp(

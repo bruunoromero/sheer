@@ -81,6 +81,12 @@
 
 (def log! (-> :console from-global :log))
 
+;; Objects
+
+(def pick lang.core/pick)
+(defn keys [obj]
+  (.keys (from-global :Object) obj))
+
 ;; Strings
 
 (defn split [d s]

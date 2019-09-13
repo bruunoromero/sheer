@@ -14,7 +14,7 @@ export const compile = (
   const filePath = utils.nameToPath(ns as string, project.config, true);
 
   return babelCore.transformFromAstAsync(
-    traverser.traverse(file.program, project, { ns: file.ns }),
+    traverser.traverse(file, project, { ns: file.ns }),
     file.source,
     {
       filename: filePath,

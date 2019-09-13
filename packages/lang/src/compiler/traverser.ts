@@ -6,8 +6,9 @@ import { IrType } from "../ir/types";
 import * as transformer from "./transformer";
 import { Project } from "../project";
 import { IrNode, IrExpressionNode } from "../ir/ast/node";
+import { IrFile } from "../ir";
 
-export const traverse = (ir, config, opts) => {
+export const traverse = (file: IrFile, config, opts) => {
   const langCore = babel.importDeclaration(
     [babel.importNamespaceSpecifier(babel.identifier(utils.CORE))],
     babel.stringLiteral(`@${utils.EXT}/lang/core`)
@@ -21,13 +22,24 @@ export const traverse = (ir, config, opts) => {
   ]);
 
   const exportGlobals = babel.exportDefaultDeclaration(
-    babel.identifier(utils.GLOBALS)
+    babel.callExpression(
+      babel.memberExpression(
+        babel.identifier(utils.CORE),
+        babel.identifier("pick")
+      ),
+      [
+        babel.arrayExpression(
+          file.exports().map(name => babel.stringLiteral(name))
+        ),
+        babel.identifier(utils.GLOBALS)
+      ]
+    )
   );
 
   const body = ([langCore] as any[])
     .concat([globals])
     .concat(
-      ir
+      file.program
         .map(node => traverseNode(node, config, opts))
         .filter(e => e)
         .map(transformer.statement)

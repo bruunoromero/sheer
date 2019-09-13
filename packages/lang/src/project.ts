@@ -165,7 +165,7 @@ export const loadProject = async () => {
     path.join(process.cwd(), config.metaSource)
   );
 
-  return new Project(config, projectMetas.concat(depsMetas.flat()), deps);
+  return new Project(config, projectMetas.concat(depsMetas).flat(), deps);
 };
 
 const mainPath = (

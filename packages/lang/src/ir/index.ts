@@ -42,8 +42,12 @@ export class IrFile {
     ) as [string, IrRequireNode][];
   }
 
+  privates() {
+    return this.ctx.collectPrivates();
+  }
+
   exports() {
-    return this.ctx.collectExports();
+    return this.ctx.collectExports().map(([name]) => name);
   }
 
   meta() {
@@ -51,7 +55,7 @@ export class IrFile {
       moment().format(),
       this.ns,
       this.path,
-      this.exports().map(([name]) => name),
+      this.exports(),
       this.requires().map(([name]) => name)
     );
   }

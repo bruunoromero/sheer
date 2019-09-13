@@ -26,7 +26,7 @@ export const loadFolder = async (
   metas: IrMeta[],
   folderName: string,
   project: Project
-): Promise<IrFile[]> => {
+): Promise<string[]> => {
   const files = await utils.traverseFolder(folderName);
 
   const jsFiles = files.filter(
@@ -44,23 +44,23 @@ export const loadFolder = async (
     })
   );
 
-  const compiledFiles = R.dropWhile(([filePath, stat]) => {
-    if (path.extname(filePath) !== ".sheer") return true;
+  return files
+    .filter(([filePath, stat]) => {
+      if (path.extname(filePath) !== ".sheer") return false;
 
-    const meta = metas.find(meta => meta.path === filePath);
+      const meta = metas.find(meta => meta.path === filePath);
 
-    if (!meta) {
+      if (!meta) {
+        return true;
+      }
+
+      if (moment(stat.mtime).isAfter(meta.createdAt)) {
+        return true;
+      }
+
       return false;
-    }
-
-    if (moment(stat.mtime).isAfter(meta.createdAt)) {
-      return false;
-    }
-
-    return true;
-  }, files).map(([path]) => compileToIr(path, project));
-
-  return Promise.all(compiledFiles);
+    })
+    .map(([path]) => path);
 };
 
 const resolveFileSymbols = (name: string, file: IrFile, metas: any) => {
@@ -83,6 +83,10 @@ const resolveSymbols = (sortedFiles: IrFile[], metas: IrMeta[]): Meta[] => {
 };
 
 const sortFiles = (files: IrFile[]) => {
+  if (files.length === 1) {
+    return files;
+  }
+
   const genDep = (file: IrFile): [string, string][] => {
     return file.requires().map(([name, req]) => [file.ns, req.ns.value]);
   };
@@ -102,15 +106,32 @@ export const compile = async () => {
   const project = await loadProject();
 
   try {
-    const filesToCompile = await loadFolder(
+    const changedFiles = await loadFolder(
       project.metas,
       project.config.rootSource,
       project
     );
 
+    const changedNs = changedFiles.map(path =>
+      utils.pathToName(path, project.config)
+    );
+
+    const pathsToCompile = project.metas
+      .filter(meta => {
+        return meta.requires.some(ns => changedNs.indexOf(ns) !== -1);
+      })
+      .map(meta => meta.path)
+      .concat(changedFiles);
+
+    const filesToCompile = await Promise.all(
+      pathsToCompile.map(path => compileToIr(path, project))
+    );
+
     const compilations = resolveSymbols(
       sortFiles(filesToCompile),
-      project.metas
+      project.metas.filter(meta =>
+        changedFiles.some(path => path !== meta.path)
+      )
     ).map(async meta => {
       const compiled = await compiler.compile(meta.file, meta.name, project);
       const filePath = utils.nameToPath(meta.name, project.config, true);

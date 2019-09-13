@@ -30,6 +30,14 @@ export class IrContext {
     );
   }
 
+  collectPrivates(): string[] {
+    return Object.entries(this.definitions)
+      .filter(
+        ([_, el]) => el.type === IrType.DEF && (el as IrDefNode).isPrivate
+      )
+      .map(([name]) => name);
+  }
+
   collectExports(): [string, IrDefNode][] {
     return Object.entries(this.definitions).filter(
       ([_, el]) => el.type === IrType.DEF && !(el as IrDefNode).isPrivate

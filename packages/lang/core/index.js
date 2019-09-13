@@ -18,11 +18,13 @@ const curry = f => {
   return currify;
 };
 
-// Arithmetic Operations
-
-module.exports.throw = () => {
-  throw "err";
+module.exports.pick = (keys, obj) => {
+  return Object.keys(obj)
+    .filter(key => keys.indexOf(key) >= 0)
+    .reduce((newObj, key) => Object.assign(newObj, { [key]: obj[key] }), {});
 };
+
+// Arithmetic Operations
 
 module.exports.add = curry((...els) => {
   return els.reduce((a, b) => a + b);
@@ -48,15 +50,15 @@ module.exports.notEq = curry((l, r) => {
   return l !== r;
 });
 
-module.exports.not = curry(v => {
+module.exports.not = v => {
   return !v;
-});
+};
 
 // Interop
 
-module.exports.fromGlobal = curry(name => {
+module.exports.fromGlobal = name => {
   return root[name];
-});
+};
 
 module.exports.instaciate = curry((Cls, args) => {
   return new (Cls.bind.apply(Cls, args))();
@@ -66,9 +68,9 @@ module.exports.isInstance = curry((Cls, v) => {
   return v instanceof Cls;
 });
 
-module.exports.r = curry(pattern => {
+module.exports.r = pattern => {
   return new RegExp(pattern);
-});
+};
 
 module.exports.tryCatch = curry((toTry, toCatch) => {
   try {
@@ -78,19 +80,19 @@ module.exports.tryCatch = curry((toTry, toCatch) => {
   }
 });
 
+module.exports.throw = e => {
+  throw e;
+};
+
 module.exports.discard = curry(fn => {
   return (...args) => {
     fn(...args);
   };
 });
 
-module.exports.raise = curry(err => {
-  throw err;
-});
-
-module.exports.type = curry(v => {
+module.exports.type = v => {
   return typeof v;
-});
+};
 
 module.exports.apply = curry((fn, args) => {
   return fn(...args);
