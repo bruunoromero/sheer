@@ -15,6 +15,7 @@ import { ExNamespaceTraverser } from "./namespace";
 import { ExNativeCallTraverser } from "./native_call";
 import { ExRequireTraverser } from "./require";
 import { ExWhenTraverser } from "./when";
+import { ExLetTraverser } from "./let";
 
 export class ExListTraverser extends AExTraverser {
   traverse(node: ParserList): ExNode {
@@ -90,6 +91,11 @@ export class ExListTraverser extends AExTraverser {
       case "or":
         return new ExLogOpTraverser(
           "||",
+          this.validator,
+          this.traverser
+        ).traverseAndValidate(node);
+      case "let":
+        return new ExLetTraverser(
           this.validator,
           this.traverser
         ).traverseAndValidate(node);

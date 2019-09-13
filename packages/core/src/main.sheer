@@ -1,3 +1,6 @@
 (ns main)
 
-(log! "ola mundo")
+(let [a 10
+      b 20]
+ (log! "ola mundo")
+ (log! (+ a b)))

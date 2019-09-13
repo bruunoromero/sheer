@@ -1,6 +1,7 @@
-const path = require("path");
+import * as path from "path";
 
-const utils = require("../src/utils.js");
+import * as utils from "../src/utils";
+import { SheerConfig } from "../src/project";
 
 describe("utils", () => {
   describe("normalizeName", () => {
@@ -71,25 +72,27 @@ describe("utils", () => {
 
   describe("pathToName", () => {
     it("should take a path and a object with the `rootSource` key, and returns a valid symbol", () => {
-      expect(utils.pathToName("a/b/c/d.ext", { rootSource: "a" })).toBe(
-        "b.c.d"
-      );
+      expect(
+        utils.pathToName("a/b/c/d.ext", { rootSource: "a" } as SheerConfig)
+      ).toBe("b.c.d");
 
-      expect(utils.pathToName("src/lang/core.ext", { rootSource: "src" })).toBe(
-        "lang.core"
-      );
+      expect(
+        utils.pathToName("src/lang/core.ext", {
+          rootSource: "src"
+        } as SheerConfig)
+      ).toBe("lang.core");
     });
   });
 
   describe("nameToPath", () => {
     it("should take a name and object with the `rootSource` key, and returns the path of that name", () => {
-      expect(utils.nameToPath("b.c.d", { rootSource: "a" })).toBe(
-        path.resolve("a/b/c/d.sheer")
-      );
+      expect(
+        utils.nameToPath("b.c.d", { rootSource: "a" } as SheerConfig)
+      ).toBe("a/b/c/d.sheer");
 
-      expect(utils.nameToPath("lang.core", { rootSource: "src" })).toBe(
-        path.resolve("src/lang/core.sheer")
-      );
+      expect(
+        utils.nameToPath("lang.core", { rootSource: "src" } as SheerConfig)
+      ).toBe("src/lang/core.sheer");
     });
   });
 
