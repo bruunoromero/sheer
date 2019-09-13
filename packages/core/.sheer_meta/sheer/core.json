@@ -1,7 +1,7 @@
 {
-  "createdAt": "2019-09-12T15:48:34-03:00",
+  "createdAt": "2019-09-13T13:52:01-03:00",
   "ns": "sheer.core",
-  "path": "/Users/bruno.barreira/git-repo/sheer/packages/core/src/sheer/core.sheer",
+  "path": "src/sheer/core.sheer",
   "exports": [
     "r",
     "get",

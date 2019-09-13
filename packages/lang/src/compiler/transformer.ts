@@ -177,6 +177,8 @@ export const require_ = withLoc(
           )
           .slice(1);
 
+    if (!filePath) return;
+
     const name = traverse(node.ns, project);
     const as = node.as ? traverse(node.as, project) : null;
     return babel.importDeclaration(

@@ -1,4 +1,6 @@
 import "source-map-support/register";
+import * as fs from "fs-extra";
+import * as path from "path";
 import * as compiler from "./compiler";
 import { IrFile, IrMeta } from "./ir";
 import * as loader from "./loader";
@@ -7,6 +9,7 @@ import * as resolver from "./resolver";
 import * as utils from "./utils";
 
 import moment = require("moment");
+import { ensureDir } from "fs-extra";
 
 type Meta = { name: string; file: IrFile; meta: IrMeta };
 
@@ -26,9 +29,26 @@ export const loadFolder = async (
 ): Promise<IrFile[]> => {
   const files = await utils.traverseFolder(folderName);
 
+  const jsFiles = files.filter(
+    ([filePath]) => path.extname(filePath) === ".js"
+  );
+
+  await ensureDir(project.config.outSource);
+
+  await Promise.all(
+    jsFiles.map(([filePath]) => {
+      return fs.copyFile(
+        filePath,
+        filePath.replace(project.config.rootSource, project.config.outSource)
+      );
+    })
+  );
+
   const compiledFiles = files
-    .filter(([path, stat]) => {
-      const meta = metas.find(meta => meta.path === path);
+    .filter(([filePath, stat]) => {
+      if (path.extname(filePath) !== ".sheer") return false;
+
+      const meta = metas.find(meta => meta.path === filePath);
 
       if (!meta) {
         return true;

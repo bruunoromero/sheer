@@ -47,11 +47,12 @@ const searchConfig = (): Promise<RcConfig> => {
 };
 
 const nodeModulesChanged = async () => {
-  const depsFolder = path.join(process.cwd(), utils.META_FOLDER, ".deps");
-  if (await fs.pathExists(depsFolder)) {
+  const depsFile = path.join(process.cwd(), utils.META_FOLDER, ".deps.json");
+
+  if (await fs.pathExists(depsFile)) {
     const [moduleStat, depsStat] = await Promise.all([
       fs.lstat(path.join(process.cwd(), "node_modules")),
-      fs.lstat(depsFolder)
+      fs.lstat(depsFile)
     ]);
 
     return moment(moduleStat.mtime).isAfter(depsStat.mtime);
@@ -61,31 +62,27 @@ const nodeModulesChanged = async () => {
 };
 
 const searchDependenciesConfig = async (folderPath = "node_modules") => {
-  if (true) {
-    const modulesPath = path.join(process.cwd(), folderPath);
-    const dirs = await fs.readdir(modulesPath);
-    const searchs = dirs.map(async dirName => {
-      if (dirName[0] === "@") {
-        return (await searchDependenciesConfig(
-          path.join(folderPath, dirName)
-        )).flat();
-      }
+  const modulesPath = path.join(process.cwd(), folderPath);
+  const dirs = await fs.readdir(modulesPath);
+  const searchs = dirs.map(async dirName => {
+    if (dirName[0] === "@") {
+      return (await searchDependenciesConfig(
+        path.join(folderPath, dirName)
+      )).flat();
+    }
 
-      return await cosmiconfig(utils.EXT, { stopDir: modulesPath }).search(
-        path.join(modulesPath, dirName)
-      );
-    });
+    return await cosmiconfig(utils.EXT, { stopDir: modulesPath }).search(
+      path.join(modulesPath, dirName)
+    );
+  });
 
-    const deps = (await allSettled(searchs))
-      .flat()
-      .filter(result => result.status === "fulfilled")
-      .map((result: any) => result.value)
-      .filter(result => result);
+  const deps = (await allSettled(searchs))
+    .flat()
+    .filter(result => result.status === "fulfilled")
+    .map((result: any) => result.value)
+    .filter(result => result);
 
-    return deps.flat();
-  }
-
-  return [];
+  return deps.flat();
 };
 
 const buildConfig = ({ filepath, config, isEmpty }: RcConfig): SheerConfig => {
@@ -129,6 +126,7 @@ const loadMetas = async (folderName: string): Promise<IrMeta[]> => {
 };
 
 export const loadProject = async () => {
+  const depsFile = path.join(process.cwd(), utils.META_FOLDER, ".deps.json");
   const result = await searchConfig();
 
   if (!result) {
@@ -136,17 +134,32 @@ export const loadProject = async () => {
   }
 
   const config = buildConfig(result);
-  const depsConfigs = (await searchDependenciesConfig()).map(buildConfig);
+  const hasChanged = await nodeModulesChanged();
 
-  const depsMetas: any[] = await Promise.all(
-    depsConfigs.map(config =>
-      loadMetas(path.join(process.cwd(), "node_modules", config.metaSource))
-    )
-  );
+  let deps: [SheerConfig, IrMeta[]][];
+  let depsMetas: IrMeta[];
+  if (hasChanged) {
+    const depsConfigs = (await searchDependenciesConfig()).map(buildConfig);
 
-  const deps = depsConfigs.map((config, index) => {
-    return [config, depsMetas[index]];
-  });
+    depsMetas = await Promise.all(
+      depsConfigs.map(config =>
+        loadMetas(path.join(process.cwd(), "node_modules", config.metaSource))
+      )
+    );
+
+    deps = depsConfigs.map((config, index) => {
+      return [config, depsMetas[index]];
+    });
+
+    await fs.ensureFile(depsFile);
+    await fs.writeJSON(depsFile, deps);
+  } else {
+    deps = await fs.readJSON(depsFile);
+
+    depsMetas = deps
+      .map(([config, metas]) => metas)
+      .reduce((acc, curr) => acc.concat(curr), []);
+  }
 
   const projectMetas = await loadMetas(
     path.join(process.cwd(), config.metaSource)
