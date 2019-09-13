@@ -7,7 +7,7 @@ import * as loader from "./loader";
 import { loadProject, SheerConfig, Project } from "./project";
 import * as resolver from "./resolver";
 import * as utils from "./utils";
-
+import * as R from "ramda";
 import moment = require("moment");
 import { ensureDir } from "fs-extra";
 
@@ -44,23 +44,21 @@ export const loadFolder = async (
     })
   );
 
-  const compiledFiles = files
-    .filter(([filePath, stat]) => {
-      if (path.extname(filePath) !== ".sheer") return false;
+  const compiledFiles = R.dropWhile(([filePath, stat]) => {
+    if (path.extname(filePath) !== ".sheer") return true;
 
-      const meta = metas.find(meta => meta.path === filePath);
+    const meta = metas.find(meta => meta.path === filePath);
 
-      if (!meta) {
-        return true;
-      }
-
-      if (moment(stat.mtime).isAfter(meta.createdAt)) {
-        return true;
-      }
-
+    if (!meta) {
       return false;
-    })
-    .map(([path]) => compileToIr(path, project));
+    }
+
+    if (moment(stat.mtime).isAfter(meta.createdAt)) {
+      return false;
+    }
+
+    return true;
+  }, files).map(([path]) => compileToIr(path, project));
 
   return Promise.all(compiledFiles);
 };

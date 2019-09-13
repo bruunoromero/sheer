@@ -1,6 +1,6 @@
 (ns main)
 
 (let [a 10
-      b 20]
+      b a]
  (log! "ola mundo")
  (log! (+ a b)))
