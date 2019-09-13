@@ -1,8 +1,11 @@
-import * as R from "ramda";
-import * as path from "path";
 import * as cosmiconfig from "cosmiconfig";
-
+import * as fs from "fs-extra";
+import * as path from "path";
+import * as R from "ramda";
 import * as utils from "./utils";
+import moment = require("moment");
+import allSettled = require("promise.allsettled");
+import { IrMeta } from "./ir";
 
 export interface SheerConfig {
   tests: string;
@@ -31,8 +34,6 @@ interface RcConfig {
 const entryName = entry => `${entry}.${utils.EXT}`;
 export const ENTRY_NAME = entryName("main");
 
-let _config: SheerConfig | undefined;
-
 const DEFAULT_CONFIG = {
   src: "src",
   out: "out",
@@ -41,14 +42,61 @@ const DEFAULT_CONFIG = {
   version: "0.0.1"
 };
 
-const searchConfig = (): RcConfig => {
-  return cosmiconfig(utils.EXT).searchSync();
+const searchConfig = (): Promise<RcConfig> => {
+  return cosmiconfig(utils.EXT).search();
+};
+
+const nodeModulesChanged = async () => {
+  const depsFolder = path.join(process.cwd(), utils.META_FOLDER, ".deps");
+  if (await fs.pathExists(depsFolder)) {
+    const [moduleStat, depsStat] = await Promise.all([
+      fs.lstat(path.join(process.cwd(), "node_modules")),
+      fs.lstat(depsFolder)
+    ]);
+
+    return moment(moduleStat.mtime).isAfter(depsStat.mtime);
+  }
+
+  return true;
+};
+
+const searchDependenciesConfig = async (folderPath = "node_modules") => {
+  if (true) {
+    const modulesPath = path.join(process.cwd(), folderPath);
+    const dirs = await fs.readdir(modulesPath);
+    const searchs = dirs.map(async dirName => {
+      if (dirName[0] === "@") {
+        return (await searchDependenciesConfig(
+          path.join(folderPath, dirName)
+        )).flat();
+      }
+
+      return await cosmiconfig(utils.EXT, { stopDir: modulesPath }).search(
+        path.join(modulesPath, dirName)
+      );
+    });
+
+    const deps = (await allSettled(searchs))
+      .flat()
+      .filter(result => result.status === "fulfilled")
+      .map((result: any) => result.value)
+      .filter(result => result);
+
+    return deps.flat();
+  }
+
+  return [];
 };
 
 const buildConfig = ({ filepath, config, isEmpty }: RcConfig): SheerConfig => {
   const rcConfig = isEmpty ? {} : config;
 
-  const projectRoot = path.dirname(filepath);
+  let projectRoot = path.dirname(filepath).replace(process.cwd(), "");
+
+  if (projectRoot.startsWith("/node_modules/")) {
+    projectRoot = projectRoot.replace("/node_modules/", "");
+  }
+
   const merdedConfig = R.mergeDeepLeft(rcConfig, DEFAULT_CONFIG);
 
   const outSource = path.join(projectRoot, merdedConfig.out);
@@ -71,15 +119,40 @@ const buildConfig = ({ filepath, config, isEmpty }: RcConfig): SheerConfig => {
   };
 };
 
-export const loadProject = () => {
-  const result = searchConfig();
+const loadMetas = async (folderName: string): Promise<IrMeta[]> => {
+  const files = await utils.traverseFolder(folderName);
+  const jsons = await Promise.all(files.map(([path]) => fs.readJSON(path)));
+
+  return jsons.filter((meta: IrMeta) => {
+    return fs.pathExists(meta.path);
+  });
+};
+
+export const loadProject = async () => {
+  const result = await searchConfig();
 
   if (!result) {
     throw "Could not load configuration file";
   }
 
   const config = buildConfig(result);
-  return new Project(config);
+  const depsConfigs = (await searchDependenciesConfig()).map(buildConfig);
+
+  const depsMetas: any[] = await Promise.all(
+    depsConfigs.map(config =>
+      loadMetas(path.join(process.cwd(), "node_modules", config.metaSource))
+    )
+  );
+
+  const deps = depsConfigs.map((config, index) => {
+    return [config, depsMetas[index]];
+  });
+
+  const projectMetas = await loadMetas(
+    path.join(process.cwd(), config.metaSource)
+  );
+
+  return new Project(config, projectMetas.concat(depsMetas.flat()), deps);
 };
 
 const mainPath = (
@@ -91,5 +164,9 @@ const mainPath = (
 };
 
 export class Project {
-  constructor(public readonly config: SheerConfig) {}
+  constructor(
+    public readonly config: SheerConfig,
+    public readonly metas: IrMeta[],
+    public readonly deps: [SheerConfig, IrMeta[]][]
+  ) {}
 }

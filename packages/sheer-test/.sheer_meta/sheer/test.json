@@ -1,0 +1,14 @@
+{
+  "createdAt": "2019-09-13T00:55:51-03:00",
+  "ns": "sheer.test",
+  "path": "src/sheer/test.sheer",
+  "exports": [
+    "describe",
+    "it",
+    "expect",
+    "same?"
+  ],
+  "requires": [
+    "sheer.core"
+  ]
+}

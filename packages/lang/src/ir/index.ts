@@ -11,6 +11,7 @@ import { IrNode } from "./ast/node";
 import { IrRequireNode } from "./ast/require";
 import { IrSymbolNode, IrStringNode } from "./ast/primitives";
 import { IrType } from "./types";
+import { IrRequireTraverser } from "./traverser/require";
 
 export class IrMeta {
   constructor(
@@ -35,8 +36,10 @@ export class IrFile {
     return this.ctx.collectDependencies();
   }
 
-  requires() {
-    return this.dependencies().filter(([_, el]) => el.type === IrType.REQUIRE);
+  requires(): [string, IrRequireNode][] {
+    return this.dependencies().filter(
+      ([_, el]) => el.type === IrType.REQUIRE
+    ) as [string, IrRequireNode][];
   }
 
   exports() {

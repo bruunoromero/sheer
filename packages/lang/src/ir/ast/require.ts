@@ -9,7 +9,7 @@ export class IrRequireNode extends IrNode {
     loc: Location,
     public readonly ns: IrSymbolNode,
     public readonly as: IrSymbolNode | null,
-    public readonly refer: IrVectorNode | IrStringNode | null
+    public readonly refer: IrSymbolNode[] | IrStringNode | null
   ) {
     super(loc, IrType.REQUIRE);
   }

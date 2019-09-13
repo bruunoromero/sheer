@@ -5,8 +5,11 @@ import * as utils from "../utils";
 import { IrDefNode } from "../ir/ast/def";
 import { IrSymbolNode } from "../ir/ast/primitives";
 import { IrMapNode } from "../ir/ast/map";
+import { Project } from "../project";
+import { IrRequireNode } from "../ir/ast/require";
+import { IrNode } from "../ir/ast/node";
 
-const withLoc = fn => (node, ...others) => {
+const withLoc = fn => (node: IrNode, ...others) => {
   const n = fn(node, ...others);
 
   if (n) {
@@ -158,20 +161,30 @@ export const fnCall = withLoc((node, traverse) => {
   return babel.callExpression(traverse(node.callee), node.args.map(traverse));
 });
 
-export const require_ = withLoc((node, traverse, config) => {
-  const currentPath = utils.nameToPath(config.ns, config, true);
-  const filePath = utils.nameToPath(node.ns.value, config, true);
-  const resolvedPath = path.relative(currentPath, filePath).slice(1);
+export const require_ = withLoc(
+  (node: IrRequireNode, traverse, project: Project, opts) => {
+    const dep = project.deps.find(
+      ([config, metas]) =>
+        metas.filter(meta => meta.ns === node.ns.value).length
+    );
 
-  if (!resolvedPath) return;
+    const filePath = dep
+      ? utils.nameToPath(node.ns.value, dep[0], true)
+      : path
+          .relative(
+            utils.nameToPath(opts.ns, project.config, true),
+            utils.nameToPath(node.ns.value, project.config, true)
+          )
+          .slice(1);
 
-  const name = traverse(node.ns, config);
-  const as = node.as ? traverse(node.as, config) : null;
-  return babel.importDeclaration(
-    [babel.importDefaultSpecifier(as || name)],
-    babel.stringLiteral(resolvedPath)
-  );
-});
+    const name = traverse(node.ns, project);
+    const as = node.as ? traverse(node.as, project) : null;
+    return babel.importDeclaration(
+      [babel.importDefaultSpecifier(as || name)],
+      babel.stringLiteral(filePath)
+    );
+  }
+);
 
 export const nativeCall = withLoc((node, traverse) => {
   const member = babel.memberExpression(

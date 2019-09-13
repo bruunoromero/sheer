@@ -1,0 +1,10 @@
+{
+  "createdAt": "2019-09-13T00:56:07-03:00",
+  "ns": "tests.sheer.core",
+  "path": "src/tests/sheer/core.sheer",
+  "exports": [],
+  "requires": [
+    "sheer.test",
+    "sheer.core"
+  ]
+}

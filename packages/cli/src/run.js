@@ -1,11 +1,9 @@
 const compiler = require("@sheer/lang")
 const { fork } = require("child_process")
 
-const project = require("@sheer/lang/dist/project")
-
-module.exports = () => {
+module.exports = async () => {
   console.time("Done")
-  const config = compiler.compile()
+  const config = await compiler.compile()
   const command = fork(config.entryCompiled)
 
   command.on("exit", function(code) {

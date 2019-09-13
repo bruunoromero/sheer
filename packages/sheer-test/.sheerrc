@@ -2,7 +2,7 @@
   "name": "sheer-test",
   "src": "src",
   "out": "out",
-  "main": "main",
+  "main": "sheer.test",
   "tests": "tests",
   "version": "0.0.1"
 }

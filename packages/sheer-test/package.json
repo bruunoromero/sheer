@@ -4,6 +4,7 @@
   "main": "index.js",
   "license": "MIT",
   "dependencies": {
+    "@sheer/core": "^1.0.0",
     "@sheer/lang": "^1.0.0"
   }
 }

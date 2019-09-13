@@ -46,7 +46,19 @@ const resolveSymbol = (
   }
 
   for (let [name, file] of ctx.collectRefers()) {
-    if (file.refer.type === IrType.STRING) {
+    if (Array.isArray(file.refer)) {
+      for (let expNode of file.refer) {
+        const expName = expNode.value as any;
+
+        if (expName === node.value) {
+          return new IrMemberNode(
+            node.loc,
+            file.ns.toExpression(),
+            IrStringNode.fromIrNode(node, node.value)
+          );
+        }
+      }
+    } else if (file.refer.type === IrType.STRING) {
       if (file.refer.value !== "all") {
         // TODO: Error
       }
@@ -60,18 +72,6 @@ const resolveSymbol = (
             IrStringNode.fromIrNode(node, node.value)
           );
         }
-      }
-    }
-
-    for (let expNode of (file.refer as IrVectorNode).value) {
-      const expName = expNode.value as any;
-
-      if (expName === node.value) {
-        return new IrMemberNode(
-          node.loc,
-          file.ns.toExpression(),
-          IrStringNode.fromIrNode(node, node.value)
-        );
       }
     }
   }

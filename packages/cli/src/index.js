@@ -1,16 +1,16 @@
 #!/usr/bin/env node
 
 const program = require("commander")
-const compiler = require("@sheer/lang")
 
 const run = require("./run")
 const test = require("./test")
 const create = require("./create")
+const compile = require("./compile")
 
 program
   .command("compile")
   .alias("c")
-  .action(compiler.compile)
+  .action(compile)
 
 program
   .command("run")

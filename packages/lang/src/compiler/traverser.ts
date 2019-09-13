@@ -1,11 +1,13 @@
-const babel = require("@babel/types");
+import * as babel from "@babel/types";
 
 import * as utils from "../utils";
 
 import { IrType } from "../ir/types";
 import * as transformer from "./transformer";
+import { Project } from "../project";
+import { IrNode, IrExpressionNode } from "../ir/ast/node";
 
-module.exports = (ir, config) => {
+export const traverse = (ir, config, opts) => {
   const langCore = babel.importDeclaration(
     [babel.importNamespaceSpecifier(babel.identifier(utils.CORE))],
     babel.stringLiteral(`@${utils.EXT}/lang/core`)
@@ -22,11 +24,11 @@ module.exports = (ir, config) => {
     babel.identifier(utils.GLOBALS)
   );
 
-  const body = [langCore]
+  const body = ([langCore] as any[])
     .concat([globals])
     .concat(
       ir
-        .map(node => traverse(node, config))
+        .map(node => traverseNode(node, config, opts))
         .filter(e => e)
         .map(transformer.statement)
     )
@@ -35,42 +37,42 @@ module.exports = (ir, config) => {
   return babel.program(body, [], "module");
 };
 
-const traverse = (node, config) => {
+const traverseNode = (node: IrNode, project: Project, opts?: any) => {
   switch (node.type) {
     case IrType.STRING:
       return transformer.string(node);
     case IrType.DEF:
-      return transformer.def(node, traverse);
+      return transformer.def(node, traverseNode);
     case IrType.NUMBER:
       return transformer.number(node);
     case IrType.BOOL:
       return transformer.bool(node);
     case IrType.IF:
-      return transformer.if_(node, traverse);
+      return transformer.if_(node, traverseNode);
     case IrType.SYMBOL:
       return transformer.symbol(node);
     case IrType.NULL:
       return transformer.null_();
     case IrType.LOG_OP:
-      return transformer.logOp(node, traverse);
+      return transformer.logOp(node, traverseNode);
     case IrType.FN:
-      return transformer.fn(node, traverse);
+      return transformer.fn(node, traverseNode);
     case IrType.MEMBER:
-      return transformer.member(node, traverse);
+      return transformer.member(node, traverseNode);
     case IrType.VECTOR:
-      return transformer.vector(node, traverse);
+      return transformer.vector(node, traverseNode);
     case IrType.MAP:
-      return transformer.map(node, traverse);
+      return transformer.map(node, traverseNode);
     case IrType.FN_CALL:
-      return transformer.fnCall(node, traverse);
+      return transformer.fnCall(node, traverseNode);
     case IrType.REQUIRE:
-      return transformer.require_(node, traverse, config);
+      return transformer.require_(node, traverseNode, project, opts);
     case IrType.IMPORT:
-      return transformer.import_(node, traverse, config);
+      return transformer.import_(node, traverseNode, project);
     case IrType.EXPRESSION:
-      return traverse(node.value, config);
+      return traverseNode((node as IrExpressionNode).value, project);
     case IrType.NATIVE_CALL:
-      return transformer.nativeCall(node, traverse);
+      return transformer.nativeCall(node, traverseNode);
   }
 
   throw `could not traverse type ${node.type} at compiler`;

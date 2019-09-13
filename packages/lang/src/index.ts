@@ -1,62 +1,48 @@
 import "source-map-support/register";
-
-import * as fs from "fs";
-import * as path from "path";
-import * as rimraf from "rimraf";
-
+import * as compiler from "./compiler";
+import { IrFile, IrMeta } from "./ir";
 import * as loader from "./loader";
-import { loadProject, SheerConfig } from "./project";
-
+import { loadProject, SheerConfig, Project } from "./project";
+import * as resolver from "./resolver";
 import * as utils from "./utils";
 
-import * as resolver from "./resolver";
-import * as compiler from "./compiler";
-
-import { IrFile, IrMeta } from "./ir";
-import toposort = require("toposort");
 import moment = require("moment");
 
 type Meta = { name: string; file: IrFile; meta: IrMeta };
 
-export const compileToIr = (path: string, config): any => {
-  return loader.loadFile(path, config);
+export const compileToIr = (path: string, project: Project): any => {
+  return loader.loadFile(path, project.config);
 };
 
-export const fromNsToIr = (ns: string, config: SheerConfig) => {
-  const path = utils.nameToPath(ns, config);
-  return compileToIr(path, config);
+export const fromNsToIr = (ns: string, project: Project) => {
+  const path = utils.nameToPath(ns, project.config);
+  return compileToIr(path, project);
 };
 
-const traverseFolder = folderName => {
-  if (!fs.existsSync(folderName)) return [];
-
-  const allInFolder = fs
-    .readdirSync(folderName)
-    .map(p => path.join(folderName, p));
-
-  const folders = allInFolder.filter(path => fs.lstatSync(path).isDirectory());
-
-  const files = allInFolder.filter(path => !fs.lstatSync(path).isDirectory());
-
-  return folders.reduce(
-    (acc, folder) => acc.concat(traverseFolder(folder)),
-    files
-  );
-};
-
-export const loadFolder = (
+export const loadFolder = async (
+  metas: IrMeta[],
   folderName: string,
-  config: SheerConfig
-): IrFile[] => {
-  return traverseFolder(folderName).map(path => compileToIr(path, config));
-};
+  project: Project
+): Promise<IrFile[]> => {
+  const files = await utils.traverseFolder(folderName);
 
-const loadMetas = (folderName: string) => {
-  return traverseFolder(folderName)
-    .map(path => JSON.parse(fs.readFileSync(path, "utf8")))
-    .filter((meta: IrMeta) => {
-      return fs.existsSync(meta.path);
-    });
+  const compiledFiles = files
+    .filter(([path, stat]) => {
+      const meta = metas.find(meta => meta.path === path);
+
+      if (!meta) {
+        return true;
+      }
+
+      if (moment(stat.mtime).isAfter(meta.createdAt)) {
+        return true;
+      }
+
+      return false;
+    })
+    .map(([path]) => compileToIr(path, project));
+
+  return Promise.all(compiledFiles);
 };
 
 const resolveFileSymbols = (name: string, file: IrFile, metas: any) => {
@@ -80,66 +66,45 @@ const resolveSymbols = (sortedFiles: IrFile[], metas: IrMeta[]): Meta[] => {
 
 const sortFiles = (files: IrFile[]) => {
   const genDep = (file: IrFile): [string, string][] => {
-    return file
-      .requires()
-      .filter(([name]) => files.find(f => f.ns === name))
-      .map(([name]) => [file.ns, name]);
+    return file.requires().map(([name, req]) => [file.ns, req.ns.value]);
   };
 
-  const deps = files.map(file => genDep(file)).flat();
-
-  return toposort
-    .array(files.map(f => f.ns), deps)
-    .sort()
+  return utils
+    .tsort(
+      files
+        .map(file => genDep(file))
+        .reduce((acc, curr) => acc.concat(curr), [])
+    )
     .reverse()
-    .map(name => files.find(file => file.ns === name));
+    .map(name => files.find(file => file.ns === name))
+    .filter(e => e);
 };
 
-const filesToCompile = (files: IrFile[], metas: IrMeta[]) => {
-  return files.filter(file => {
-    const stat = fs.lstatSync(file.path);
-    const meta = metas.find(meta => meta.path === file.path);
-
-    if (!meta) {
-      return true;
-    }
-
-    if (moment(stat.mtime).isAfter(meta.createdAt)) {
-      return true;
-    }
-
-    return false;
-  });
-};
-
-const deleteFiles = (files: IrFile[], config: SheerConfig) => {
-  files.forEach(file => {
-    const path = utils.nameToPath(file.ns, config, true);
-
-    if (fs.existsSync(path)) {
-      fs.unlinkSync(path);
-    }
-  });
-};
-
-export const compile = () => {
-  const project = loadProject();
+export const compile = async () => {
+  const project = await loadProject();
 
   try {
-    const metas = loadMetas(project.config.metaSource);
-    const files = loadFolder(project.config.rootSource, project.config);
-    const modifiedFiles = filesToCompile(files, metas);
+    const filesToCompile = await loadFolder(
+      project.metas,
+      project.config.rootSource,
+      project
+    );
 
-    deleteFiles(modifiedFiles, project.config);
-
-    resolveSymbols(sortFiles(modifiedFiles), metas).forEach(meta => {
-      const compiled = compiler.compile(meta.file, meta.name, project.config);
+    const compilations = resolveSymbols(
+      sortFiles(filesToCompile),
+      project.metas
+    ).map(async meta => {
+      const compiled = await compiler.compile(meta.file, meta.name, project);
       const filePath = utils.nameToPath(meta.name, project.config, true);
       const metaPath = utils.nameToMetaPath(meta.name, project.config);
 
-      loader.writeFile(filePath, compiled.code);
-      loader.writeFile(metaPath, JSON.stringify(meta.meta, null, 2));
+      return Promise.all([
+        loader.writeFile(filePath, compiled.code),
+        loader.writeFile(metaPath, JSON.stringify(meta.meta, null, 2))
+      ]);
     });
+
+    await Promise.all(compilations);
 
     return project.config;
   } catch (e) {
