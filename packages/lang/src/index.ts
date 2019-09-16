@@ -36,8 +36,12 @@ export const loadFolder = async (
   await ensureDir(project.config.outSource);
 
   await Promise.all(
-    jsFiles.map(([filePath]) => {
-      return fs.copyFile(
+    jsFiles.map(async ([filePath]) => {
+      await fs.ensureFile(
+        filePath.replace(project.config.rootSource, project.config.outSource)
+      );
+
+      return await fs.copyFile(
         filePath,
         filePath.replace(project.config.rootSource, project.config.outSource)
       );

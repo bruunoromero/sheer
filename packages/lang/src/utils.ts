@@ -5,7 +5,7 @@ import * as path from "path";
 export const EXT = "sheer";
 export const OUT_EXT = "js";
 export const GLOBALS = "__$$GLOBALS$$__";
-export const CORE = "__$$SHEER_LANG_CORE$$__";
+export const RUNTIME = "__$$SHEER_LANG_RUNTIME$$__";
 
 export const MODULES_FOLDER = `${EXT}_stuff`;
 export const META_FOLDER = `.${EXT}_meta`;

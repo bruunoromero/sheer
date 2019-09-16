@@ -19,6 +19,16 @@ const withLoc = fn => (node: IrNode, ...others) => {
   return n;
 };
 
+const collection = value => {
+  return babel.callExpression(
+    babel.memberExpression(
+      babel.identifier(utils.RUNTIME),
+      babel.identifier("fromJS")
+    ),
+    [value]
+  );
+};
+
 export const statement = withLoc(node => {
   if (
     node.type.toLowerCase().indexOf("expression") > -1 ||
@@ -139,7 +149,7 @@ export const fn = withLoc((node, traverse) => {
   const expandedParams = toRestIfNeeded(node, params);
   return babel.callExpression(
     babel.memberExpression(
-      babel.identifier(utils.CORE),
+      babel.identifier(utils.RUNTIME),
       babel.identifier("curry")
     ),
     [
@@ -209,13 +219,15 @@ export const import_ = withLoc((node, traverse, config) => {
 });
 
 export const vector = withLoc((node, traverse) => {
-  return babel.arrayExpression(node.value.map(traverse));
+  return collection(babel.arrayExpression(node.value.map(traverse)));
 });
 
 export const map = withLoc((node: IrMapNode, traverse) => {
-  return babel.objectExpression(
-    node.value.map(([key, value]) =>
-      babel.objectProperty(traverse(key), traverse(value), true)
+  return collection(
+    babel.objectExpression(
+      node.value.map(([key, value]) =>
+        babel.objectProperty(traverse(key), traverse(value), true)
+      )
     )
   );
 });

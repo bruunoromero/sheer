@@ -10,8 +10,8 @@ import { IrFile } from "../ir";
 
 export const traverse = (file: IrFile, config, opts) => {
   const langCore = babel.importDeclaration(
-    [babel.importNamespaceSpecifier(babel.identifier(utils.CORE))],
-    babel.stringLiteral(`@${utils.EXT}/lang/core`)
+    [babel.importNamespaceSpecifier(babel.identifier(utils.RUNTIME))],
+    babel.stringLiteral(`@${utils.EXT}/lang/runtime`)
   );
 
   const globals = babel.variableDeclaration("const", [
@@ -24,7 +24,7 @@ export const traverse = (file: IrFile, config, opts) => {
   const exportGlobals = babel.exportDefaultDeclaration(
     babel.callExpression(
       babel.memberExpression(
-        babel.identifier(utils.CORE),
+        babel.identifier(utils.RUNTIME),
         babel.identifier("pick")
       ),
       [

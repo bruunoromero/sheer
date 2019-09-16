@@ -1,9 +1,0 @@
-{
-  "createdAt": "2019-09-13T17:58:17-03:00",
-  "ns": "main",
-  "path": "src/main.sheer",
-  "exports": [],
-  "requires": [
-    "sheer.core"
-  ]
-}

@@ -1,0 +1,44 @@
+Arguments: 
+  /usr/local/Cellar/node/12.9.0/bin/node /usr/local/bin/yarn install --mutex network:42424 --non-interactive
+
+PATH: 
+  /Users/bruno.barreira/git-repo/sheer/packages/sheer-test/node_modules/.bin:/Users/bruno.barreira/git-repo/sheer/packages/node_modules/.bin:/Users/bruno.barreira/git-repo/sheer/node_modules/.bin:/Users/bruno.barreira/git-repo/node_modules/.bin:/Users/bruno.barreira/node_modules/.bin:/Users/node_modules/.bin:/node_modules/.bin:/usr/local/Cellar/node/12.9.0/bin:/usr/local/opt/libxml2/bin:/Users/bruno.barreira/.cargo/bin:/usr/local/opt/gettext/bin:/usr/local/opt/gettext/bin:/usr/local/opt/gettext/bin:/usr/local/bin:/Users/bruno.barreira/dev/nu/ios-cli:/Users/bruno.barreira/dev/nu/nucli:/Users/bruno.barreira/dev/nu/nudev:/usr/local/opt/gettext/bin:/usr/local/opt/gettext/bin:/Users/bruno.barreira/.nvm/versions/node/v10.13.0/bin:/Users/bruno.barreira/dev/flutter/bin:/usr/local/opt/gettext/bin:/usr/local/opt/gettext/bin:/Users/bruno.barreira/.rvm/gems/ruby-2.3.3/bin:/Users/bruno.barreira/.rvm/gems/ruby-2.3.3@global/bin:/Users/bruno.barreira/.rvm/rubies/ruby-2.3.3/bin:/Users/bruno.barreira/.cargo/bin:/usr/local/bin:/Users/bruno.barreira/dev/nu/ios-cli:/Users/bruno.barreira/dev/nu/nucli:/Users/bruno.barreira/dev/nu/nudev:/usr/local/opt/gettext/bin:/usr/local/opt/gettext/bin:/Users/bruno.barreira/.cargo/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/MacGPG2/bin:/Users/bruno.barreira/.rvm/bin:/Users/bruno.barreira/.rvm/bin
+
+Yarn version: 
+  1.17.3
+
+Node version: 
+  12.9.0
+
+Platform: 
+  darwin x64
+
+Trace: 
+  Error: https://registry.yarnpkg.com/@sheer%2flang: Not found
+      at Request.params.callback [as _callback] (/usr/local/lib/node_modules/yarn/lib/cli.js:66830:18)
+      at Request.self.callback (/usr/local/lib/node_modules/yarn/lib/cli.js:140464:22)
+      at Request.emit (events.js:209:13)
+      at Request.<anonymous> (/usr/local/lib/node_modules/yarn/lib/cli.js:141436:10)
+      at Request.emit (events.js:209:13)
+      at IncomingMessage.<anonymous> (/usr/local/lib/node_modules/yarn/lib/cli.js:141358:12)
+      at Object.onceWrapper (events.js:297:20)
+      at IncomingMessage.emit (events.js:214:15)
+      at endReadableNT (_stream_readable.js:1178:12)
+      at processTicksAndRejections (internal/process/task_queues.js:77:11)
+
+npm manifest: 
+  {
+  	"name": "@sheer/test",
+  	"version": "1.0.0",
+  	"main": "index.js",
+  	"license": "MIT",
+  	"dependencies": {
+  		"@sheer/lang": "^1.0.0"
+  	}
+  }
+
+yarn manifest: 
+  No manifest
+
+Lockfile: 
+  No lockfile

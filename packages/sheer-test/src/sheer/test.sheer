@@ -1,13 +1,13 @@
 (ns sheer.test)
 
-(defn describe [desc f]
-  ((from-global :describe) desc (discard f)))
-
-(defn it [desc f]
-  ((from-global :it) desc (discard f)))
-
-(defn expect [v]
+(defn- expect [v]
   ((from-global :expect) v))
 
-(defn same? [v exp]
-  (.toBe ((from-global :expect) v) exp))
+(defn deftest [desc f]
+  ((from-global :describe) desc (discard f)))
+
+(defn testing [desc f]
+  ((from-global :it) desc (discard f)))
+
+(defn is [v]
+  (.toBe (expect v)) true)

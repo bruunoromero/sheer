@@ -118,9 +118,15 @@ const buildConfig = ({ filepath, config, isEmpty }: RcConfig): SheerConfig => {
 
 const loadMetas = async (folderName: string): Promise<IrMeta[]> => {
   const files = await utils.traverseFolder(folderName);
-  const jsons = await Promise.all(files.map(([path]) => fs.readJSON(path)));
+  const jsons = await Promise.all(
+    files
+      .filter(([path]) => {
+        return !path.endsWith(".deps.json");
+      })
+      .map(([path]) => fs.readJSON(path))
+  );
 
-  return jsons.filter((meta: IrMeta) => {
+  return jsons.flat().filter((meta: IrMeta) => {
     return fs.pathExists(meta.path);
   });
 };
@@ -156,16 +162,21 @@ export const loadProject = async () => {
   } else {
     deps = await fs.readJSON(depsFile);
 
-    depsMetas = deps
-      .map(([config, metas]) => metas)
-      .reduce((acc, curr) => acc.concat(curr), []);
+    depsMetas = deps.map(([config, metas]) => metas.flat()).flat();
   }
 
   const projectMetas = await loadMetas(
     path.join(process.cwd(), config.metaSource)
   );
 
-  return new Project(config, projectMetas.concat(depsMetas).flat(), deps);
+  return new Project(
+    config,
+    projectMetas
+      .flat()
+      .concat(depsMetas)
+      .flat(),
+    deps
+  );
 };
 
 const mainPath = (
